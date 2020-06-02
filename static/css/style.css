@@ -1,13 +1,47 @@
 body{
     font-family: monospace;
+    background-color: black;
+    color: white;
 }
+
 .header{
     font-size: 50px;
     display: block;
     text-align: center;
+    background-color: green;
+    margin-bottom: -50px;
+    margin-top: -45px;
 }
+
+/* Nav Bar */
+
+ul.nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+  
+li.nav {
+    float: left;
+    font-size: 20px;
+}
+  
+li a.nav {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+  
+li a:hover {
+    background-color: #111;
+}
+
 div.content{
-    min-height: calc(100vh - 200px);
+    min-height: calc(100vh - 210px);
 }
 
 .footer{
@@ -15,9 +49,5 @@ div.content{
     font-size: 20px;
     display: block;
     text-align: center;
-    width: 100%;
     background-color: red;
-    bottom: 0;
-    left: 0;
-    margin-block-end: 0.5em;
 }

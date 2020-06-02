@@ -1,0 +1,9 @@
+{% extends "layout.html"%}{% block content%}
+<p>Login:</p>
+<form method="POST" action=''>
+    {{Login_form.csrf_token }}
+    {{Login_form.username}}
+    {{Login_form.password}}
+    {{Login_form.login_submit}}
+</form>
+{% endblock %}

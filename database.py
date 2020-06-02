@@ -8,13 +8,13 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(os.path.join(project_dir,'website.db'))
 db = SQLAlchemy(app)
 
-awards = db.Table('awards', db.Column('award_id', db.Integer, db.ForeignKey('award.id'), primary_key=True), db.Column('game_id', db.Integer, db.ForeignKey('game.id'), primary_key=True))
+Awards = db.Table('awards', db.Column('award_id', db.Integer, db.ForeignKey('award.id'), primary_key=True), db.Column('game_id', db.Integer, db.ForeignKey('game.id'), primary_key=True))
 
 class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(40), nullable=False)
-    password = db.Column(db.String(40), nullable=False)
+    username = db.Column(db.String(40), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
     reviews = db.relationship('Review', backref='user', lazy=True)
 
     def __init__(self, username, password):
@@ -40,7 +40,7 @@ class Game(db.Model):
     desc = db.Column(db.String(1000), nullable=True)
     video = db.Column(db.String(40), nullable=True)
     reviews = db.relationship('Review', backref='game', lazy=True)
-    awards = db.relationship('Award', secondary=awards, backref=db.backref('game', lazy=True), lazy='subquery')
+    awards = db.relationship('Award', secondary=Awards, backref=db.backref('game', lazy=True), lazy='subquery')
 
 class Review(db.Model):
 

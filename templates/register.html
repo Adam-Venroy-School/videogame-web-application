@@ -1,0 +1,9 @@
+{% extends "layout.html"%}{% block content%}
+<p>Create user:</p>
+<form method="POST" action=''>
+    {{Register_form.csrf_token }}
+    {{Register_form.username}}
+    {{Register_form.password}}
+    {{Register_form.register_submit}}
+</form>
+{% endblock %}
