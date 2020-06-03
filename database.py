@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os.path
+from flask_login import UserMixin
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -10,7 +11,7 @@ db = SQLAlchemy(app)
 
 Awards = db.Table('awards', db.Column('award_id', db.Integer, db.ForeignKey('award.id'), primary_key=True), db.Column('game_id', db.Integer, db.ForeignKey('game.id'), primary_key=True))
 
-class User(db.Model):
+class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(40), unique=True, nullable=False)

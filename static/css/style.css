@@ -40,6 +40,10 @@ li a:hover {
     background-color: #111;
 }
 
+.logged_in{
+    float: right;
+}
+
 div.content{
     min-height: calc(100vh - 210px);
 }

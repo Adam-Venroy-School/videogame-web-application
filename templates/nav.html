@@ -1,3 +1,6 @@
 <ul class="nav">
     <li class="nav"><a href="/register">Register</a></li>
+    {% if current_user.is_authenticated %}
+    <li class="logged_in">You are logged in as {{current_user.name}}</li>
+    {% endif %}
 </ul>
