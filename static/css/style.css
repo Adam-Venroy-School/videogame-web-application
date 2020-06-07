@@ -34,6 +34,7 @@ li a.nav {
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
+    color:inherit;
   }
   
 li a:hover {
@@ -41,6 +42,9 @@ li a:hover {
 }
 
 .logged_in{
+    float: right;
+}
+.log_out{
     float: right;
 }
 

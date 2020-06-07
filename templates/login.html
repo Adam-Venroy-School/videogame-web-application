@@ -1,4 +1,5 @@
 {% extends "layout.html"%}{% block content%}
+{% include "errors.html"%}
 <p>Login:</p>
 <form method="POST" action=''>
     {{Login_form.csrf_token }}

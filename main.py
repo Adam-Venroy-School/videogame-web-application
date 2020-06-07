@@ -1,10 +1,9 @@
-from flask import render_template, redirect, url_for, request, flash
-from database import *
+from flask import render_template, redirect, url_for, request, flash, Flask
+from models import *
 from forms import *
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, current_user, login_user
-
+from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -28,12 +27,17 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
-            flash('Logged In as {}', username)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
-            flash('Login Failed')
+            flash('Invalid Username or Password')
     return render_template('login.html', Login_form=Login_form)
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect("home")
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -50,12 +54,19 @@ def register():
             #Flash Message
         else:
             db.session.commit()
+    else:
+        flash(Register_form.errors)
     return render_template('register.html', Register_form=Register_form)
 
-#If anything other than home is reached, it will be redirected to home page
+#Redirects pages that dont exist to home
 @app.errorhandler(404)
 def error(e):
     return redirect('/')
+
+#Redirects Unlogged users to log in page
+@app.login_manager.unauthorized_handler
+def auth_error():
+    return redirect('/login')
 
 if __name__ == '__main__':
     app.run(debug=True)
