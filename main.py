@@ -54,8 +54,12 @@ def register():
             #Flash Message
         else:
             db.session.commit()
-    else:
-        flash(Register_form.errors)
+    elif request.method =='POST' and Register_form.validate_on_submit() == False:
+        messages = []       
+        if 'username' in Register_form.errors:
+            flash("Ensure Username is between 3 and 20 Characters") 
+        if 'password' in Register_form.errors:
+            flash("Ensure Password is at least 8 characters")
     return render_template('register.html', Register_form=Register_form)
 
 #Redirects pages that dont exist to home
