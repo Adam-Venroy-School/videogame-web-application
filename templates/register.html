@@ -1,10 +1,16 @@
 {% extends "layout.html"%}{% block content%}
 {% include "errors.html"%}
-<p>Create user:</p>
-<form method="POST" action=''>
-    {{Register_form.csrf_token }}
-    {{Register_form.username}}
-    {{Register_form.password}}
-    {{Register_form.register_submit}}
-</form>
+<div class="w3-container w3-half w3-margin-top">
+    <div class="w3-panel w3-card">
+        <p>Register:</p>
+    <form method="POST" action=''>
+        {{Register_form.csrf_token }}
+        <p><input class="w3-input" type="text" name="username">Username</input></p>
+        <br>
+        <p><input class="w3-input" type="password" name="password">Password</p></input></p>
+        <br>
+        <p><button class="w3-button w3-section w3-teal w3-ripple"><label>Register</label></button></p>
+    </form>
+    </div>
+</div>
 {% endblock %}

@@ -1,10 +1,16 @@
 {% extends "layout.html"%}{% block content%}
 {% include "errors.html"%}
-<p>Login:</p>
-<form method="POST" action=''>
-    {{Login_form.csrf_token }}
-    {{Login_form.username}}
-    {{Login_form.password}}
-    {{Login_form.login_submit}}
-</form>
+<div class="w3-container w3-half w3-margin-top">
+    <div class="w3-panel w3-card">
+        <p>Login:</p>
+        <form method="POST" action=''>
+            {{Login_form.csrf_token }}
+            <p><input class="w3-input" type="text" name="username">Username</input></p>
+            <br>
+            <p><input class="w3-input" type="password" name="password">Password</p></input></p>
+            <br>
+            <p><button class="w3-button w3-section w3-grey w3-ripple" name="login">Log in</button></p>
+        </form>
+    </div>
+</div>
 {% endblock %}
