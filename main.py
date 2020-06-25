@@ -51,6 +51,7 @@ def register():
             db.session.flush()
         except IntegrityError:
             db.session.rollback()
+            flash("Please enter a unique username")
         else:
             db.session.commit()
     elif request.method =='POST' and Register_form.validate_on_submit() == False:
@@ -60,12 +61,75 @@ def register():
             flash("Ensure Password is at least 8 characters")
     return render_template('register.html', Register_form=Register_form)
 
+@app.route("/adddev", methods=['GET', 'POST'])
+@login_required
+def adddev():
+    add_dev_form = AddDevForm()
+    if request.method == "POST" and add_dev_form.validate_on_submit():
+        dev = add_dev_form.name.data
+        image = add_dev_form.image.data
+        entry = Developer(name=dev, logo=image)
+        db.session.add(entry)
+        db.session.commit()
+    return render_template("adddev.html", add_dev_form=add_dev_form)
 
+@app.route("/devs", methods=['GET'])
+def devlist():
+    devs = {}
+    for dev in Developer.query.all():
+        devs[dev.name] = dev.logo
+    print(devs)
+    return render_template("devlist.html", devs=devs)
+
+@app.route("/devs/<name>", methods=['GET'])
+def dev(name):
+    if db.session.query(Developer.name).filter_by(name=name).scalar() == None:
+        print("Dev not found")
+        return render_template("dev_not_found.html")
+    else:
+        developer = db.session.query(Developer).filter_by(name=name).first()
+        dev_games = db.session.query(Game).filter_by(dev=developer.name).all()
+        print(dev_games)
+        return render_template("dev.html", name=name, developer=developer, dev_games=dev_games)
+
+@app.route("/addgame", methods=['GET', 'POST'])
+@login_required
+def addgame():
+    add_game_form = AddGameForm()
+    if request.args.get('dev_from_page', None):
+        dev_from_page = request.args.get('dev_from_page', None)
+        print("DEVELOPER : {}".format(dev_from_page))
+    else:
+        dev_from_page = None
+        print(dev_from_page)
+    devs = []
+    for dev in Developer.query.order_by(Developer.name):
+        devs.append((dev.name, dev.logo))
+    print(devs)
+    if request.method == "POST":
+        print("YES")
+        game_name = add_game_form.name.data
+        dev = add_game_form.dev.data
+        link = add_game_form.link.data
+        price = add_game_form.price.data
+        image = add_game_form.image.data
+        desc = add_game_form.desc.data
+        video = add_game_form.video.data
+        entry = Game(game_name, dev, link, price, image, desc, video)
+        db.session.add(entry)
+        db.session.commit()
+    return render_template("addgame.html", add_game_form=add_game_form, devs=devs, dev_from_page=dev_from_page)
+
+@app.route("/games", methods=['GET'])
+def games():
+    games=[]
+    gamelist = Game.query.all()
+    for game in gamelist:
+        games.append((game.name, game.dev, game.image))
+    return render_template('games.html', games=games)
 
 #Redirects pages that dont exist to home
-@app.errorhandler(404)
-def error(e):
-    return redirect('/')
+
 
 #Redirects Unlogged users to log in page
 @app.login_manager.unauthorized_handler

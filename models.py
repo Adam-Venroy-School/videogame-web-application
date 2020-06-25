@@ -36,6 +36,9 @@ class Developer(db.Model):
     name = db.Column(db.String(40), nullable=False)
     logo = db.Column(db.String(40), nullable=True)
     games = db.relationship('Game', backref='developer', lazy=True)
+    def __init__(self, name, logo):
+        self.name = name
+        self.logo = logo
 
 class Game(db.Model):
 
@@ -44,10 +47,20 @@ class Game(db.Model):
     dev = db.Column(db.String, db.ForeignKey('developer.name'), nullable=False)
     link = db.Column(db.String(200), nullable=False)
     price = db.Column(db.Float(6), nullable=False)
+    image = db.Column(db.String(200), nullable=True)
     desc = db.Column(db.String(1000), nullable=True)
     video = db.Column(db.String(40), nullable=True)
     reviews = db.relationship('Review', backref='game', lazy=True)
     game_awards = db.relationship('Award', secondary=game_awards, backref=db.backref('game', lazy=True), lazy='subquery')
+
+    def __init__(self, name, dev, link, price, image, desc, video):
+        self.name = name
+        self.dev = dev
+        self.link = link
+        self.price = price
+        self.image = image
+        self.desc = desc
+        self.video = video
 
 class Review(db.Model):
 

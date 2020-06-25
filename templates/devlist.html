@@ -1,0 +1,16 @@
+{% extends "layout.html"%}{% block content%}
+<div class="list">
+{% for dev in devs.items()%}
+<div class="dev-list" style="float:left;">
+  <a href="/devs/{{dev[0]}}">
+    <div class="w3-card-4" style="width:150px;height:210px;">
+      <img src="{{dev[1]}}" alt="Alps" style="width:100%;height:80%;">
+    <div class="w3-container w3-center">
+      <p>{{dev[0]}}</p>
+    </div>
+    </div>
+  </a>
+</div>
+{%endfor%}
+</div>
+{% endblock %}

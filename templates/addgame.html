@@ -1,0 +1,55 @@
+{% extends "layout.html"%}{% block content%}
+{% include "errors.html"%}
+<div class="w3-container w3-half w3-margin-top">
+    <div class="w3-panel w3-card">
+        <p>Add Game:</p>
+        <form method="POST" action=''>
+            {{add_game_form.csrf_token }}
+            <p><input class="w3-input" type="text" name="name">Game Name</input></p>
+            <br>
+            <p><select id="dev_select" name="dev" onchange="myFunction()">
+                {% if dev_from_page == None%}
+                <option>PLEASE SELECT A DEVELOPER</option>
+                {%endif%}
+                {% for dev in devs %}
+                {%if dev_from_page == dev[0]%}
+                <option value={{dev[0]}} SELECTED>{{dev[0]}}</option>
+                {%else%}
+                <option value={{dev[0]}}>{{dev[0]}}</option>
+                {%endif%}
+                {%endfor%}
+            </select></p>
+            <p>Developer</p>
+            <br>
+            <p><input class="w3-input" name="link">Store/Download Link</p></input></p>
+            <br>
+            <p><input class="w3-input" type="number" min=0 step="0.01" name="price">Price</p></input></p>
+            <br>
+            <p><input class="w3-input" name="image">Image Link</p></input></p>
+            <br>
+            <p><input class="w3-input" name="video">Video Link</p></input></p>
+            <br>
+            <p><input class="w3-input" name="desc">Description</p></input></p>
+            <br>
+            <p><button class="w3-button w3-section w3-grey w3-ripple" name="add_game_submit">Add Game</button></p>
+        </form>
+    </div>
+</div>
+{% for dev in devs%}
+<img class="dev_logo" src="{{dev[1]}}" id='{{dev[0]}}' style='display:none;'></img>
+{%endfor%}
+<script>
+    Previous_Select = false
+    function myFunction() {
+        if (Previous_Select){
+            Previous_Select.style.display = 'none'
+        }
+        var x = document.getElementById("dev_select").value;
+        var logo = document.getElementById(x)
+        console.log(logo)
+        logo.style.display = 'block'
+        Previous_Select = logo
+        console.log(Previous_Select)
+    }   
+</script>
+{% endblock %}

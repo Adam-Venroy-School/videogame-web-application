@@ -1,0 +1,20 @@
+{% extends "layout.html"%}{% block content %}
+<div class="dev-sidepanel">
+<div class="w3-card-4" style="height:30%;margin-bottom:10px;">
+    <img src="{{developer['logo']}}" alt="" style="width:250px;height:200px;">
+    <div class="w3-container w3-center">
+        <p>{{developer['name']}}</p>
+    </div>
+</div>
+<a href="{{ url_for('addgame', dev_from_page=developer['name']) }}">
+<div class="w3-card" style="height:10%;padding: 10px;">
+    <p>Add Game</p>
+</div>
+</a>
+</div>
+<div>
+    {%for game in dev_games%}
+    {{game[name]}}
+    {%endfor%}
+</div>
+{% endblock %}
