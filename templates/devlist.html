@@ -1,7 +1,7 @@
 {% extends "layout.html"%}{% block content%}
 <div class="list">
 {% for dev in devs.items()%}
-<div class="dev-list" style="float:left;">
+<div class="list-item" style="float:left;">
   <a href="/devs/{{dev[0]}}">
     <div class="w3-card-4" style="width:150px;height:210px;">
       <img src="{{dev[1]}}" alt="Alps" style="width:100%;height:80%;">

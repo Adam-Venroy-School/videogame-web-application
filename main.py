@@ -20,6 +20,8 @@ def home():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("home"))
     Login_form = LoginForm()
     if request.method == 'POST' and Login_form.validate_on_submit():
         username = Login_form.username.data
@@ -41,6 +43,8 @@ def logout():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for("home"))
     Register_form = RegisterForm()
     if request.method == 'POST' and Register_form.validate_on_submit():
         name = Register_form.username.data
@@ -54,6 +58,9 @@ def register():
             flash("Please enter a unique username")
         else:
             db.session.commit()
+            user = User.query.filter_by(username=name).first()
+            login_user(user)
+            return redirect(url_for("home"))
     elif request.method =='POST' and Register_form.validate_on_submit() == False:
         if 'username' in Register_form.errors:
             flash("Ensure Username is between 3 and 20 Characters") 
@@ -168,6 +175,7 @@ def remove_wishlist(id):
     if backpage:
         return redirect(url_for(backpage))
     return redirect(url_for('home'))
+    
 #Redirects pages that dont exist to home
 
 

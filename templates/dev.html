@@ -1,6 +1,6 @@
 {% extends "layout.html"%}{% block content %}
 <div class="dev-sidepanel">
-<div class="w3-card-4" style="height:30%;margin-bottom:10px;">
+<div class="w3-card-4" style="height:270px;margin-bottom:10px;">
     <img src="{{developer['logo']}}" alt="" style="width:250px;height:200px;">
     <div class="w3-container w3-center">
         <p>{{developer['name']}}</p>
@@ -12,9 +12,26 @@
 </div>
 </a>
 </div>
-<div>
+<div class="dev-list">
+
     {%for game in dev_games%}
-    {{game[name]}}
+    <div class="list-item" style="float:left;">
+        <div class="w3-card-4" style="width:150px;height:230px;position: relative;">
+            {%if current_user.is_authenticated == True%}
+            {%if game['id'] in wishlist_games%}
+            <a href="{{url_for('remove_wishlist', id=game[0], backpage='games')}}"><img src="../static/images/list/subtract.jpg" class="add_remove_button"></img></a>
+            {%else%}
+            <a href="{{url_for('add_wishlist', id=game[0], backpage='games')}}"><img src="../static/images/list/add.jpg" class="add_remove_button"></img></a>
+            {%endif%}
+            {%endif%}
+            <img src="{{game['image']}}" alt="{{game['name']}}" style="width:100%;height:70%;">
+            <a href="/games/{{game['id']}}">
+                <div class="w3-container w3-center">
+                  <p>{{game['name']}}</p>
+                </div>
+            </a>
+        </div>
+    </div>
     {%endfor%}
 </div>
 {% endblock %}

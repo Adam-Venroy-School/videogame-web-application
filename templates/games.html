@@ -1,7 +1,7 @@
 {% extends "layout.html"%}{% block content%}
 <div class="list">
 {% for game in games%}
-<div class="dev-list" style="float:left;">
+<div class="list-item" style="float:left;">
     <div class="w3-card-4" style="width:150px;height:230px;position: relative;">
       {%if current_user.is_authenticated == True%}
       {%if game[0] in wishlist_games%}
