@@ -35,11 +35,21 @@
         </form>
     </div>
 </div>
+
 {% for dev in devs%}
+{%if dev[0] == dev_from_page%}
+<img class="dev_logo" src="{{dev[1]}}" id='{{dev[0]}}' style='display:block;'></img>
+<script>
+    Previous_Select = document.getElementById("{{dev[0]}}")
+</script>
+{%else%}
 <img class="dev_logo" src="{{dev[1]}}" id='{{dev[0]}}' style='display:none;'></img>
+{%endif%}
 {%endfor%}
 <script>
-    Previous_Select = false
+    if (typeof Previous_Select === "undefined"){
+        Previous_Select = false
+    }
     function myFunction() {
         if (Previous_Select){
             Previous_Select.style.display = 'none'

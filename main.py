@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request, flash, Flask
+from flask import render_template, redirect, url_for, request, flash, Flask, request
 from models import *
 from forms import *
 from sqlalchemy.exc import IntegrityError
@@ -124,10 +124,50 @@ def addgame():
 def games():
     games=[]
     gamelist = Game.query.all()
+    wishlist_games = ['']
     for game in gamelist:
-        games.append((game.name, game.dev, game.image))
-    return render_template('games.html', games=games)
+        games.append((game.id, game.name, game.dev, game.image))
+    if current_user.is_authenticated:
+        wishlist_games = db.session.query(wishlist).filter_by(user_id=current_user.id).all()
+        print(wishlist_games)
+        wishlist_games = [x[0] for x in wishlist_games]
+        print(wishlist_games)
+    return render_template('games.html', games=games, wishlist_games=wishlist_games)
 
+@login_required
+@app.route("/wishlist/add/<id>")
+def add_wishlist(id):
+    game = db.session.query(Game).filter_by(id=id).first()
+    user = current_user
+    backpage = request.args.get('backpage')
+    print(game)
+    try:
+        user.wishlist.append(game)
+        db.session.flush()
+    except:
+        return redirect(url_for("home"))
+    db.session.commit()
+    if backpage:
+        return redirect(url_for(backpage))
+    return redirect(url_for('home'))
+
+
+@login_required
+@app.route("/wishlist/remove/<id>")
+def remove_wishlist(id):
+    user = current_user
+    game = db.session.query(Game).filter_by(id=id).first()
+    backpage = request.args.get('backpage')
+    print(game)
+    try:
+        user.wishlist.remove(game)
+        db.session.flush()
+    except:
+        return redirect(url_for("home"))
+    db.session.commit()
+    if backpage:
+        return redirect(url_for(backpage))
+    return redirect(url_for('home'))
 #Redirects pages that dont exist to home
 
 

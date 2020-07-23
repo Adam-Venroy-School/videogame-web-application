@@ -24,7 +24,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(40), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     reviews = db.relationship('Review', backref='user', lazy=True)
-    user_games = db.relationship('Game', secondary=wishlist, backref=db.backref('user', lazy=True), lazy='subquery')
+    wishlist = db.relationship('Game', secondary=wishlist, backref=db.backref('user', lazy=True), lazy='subquery')
 
     def __init__(self, username, password):
         self.username = username

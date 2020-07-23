@@ -2,14 +2,21 @@
 <div class="list">
 {% for game in games%}
 <div class="dev-list" style="float:left;">
-  <a href="/games/{{game[0]}}">
-    <div class="w3-card-4" style="width:150px;height:230px;">
-      <img src="{{game[2]}}" alt="{{game[0]}}" style="width:100%;height:70%;">
+    <div class="w3-card-4" style="width:150px;height:230px;position: relative;">
+      {%if current_user.is_authenticated == True%}
+      {%if game[0] in wishlist_games%}
+        <a href="{{url_for('remove_wishlist', id=game[0], backpage='games')}}"><img src="../static/images/list/subtract.jpg" class="add_remove_button"></img></a>
+      {%else%}
+        <a href="{{url_for('add_wishlist', id=game[0], backpage='games')}}"><img src="../static/images/list/add.jpg" class="add_remove_button"></img></a>
+      {%endif%}
+      {%endif%}
+        <img src="{{game[3]}}" alt="{{game[1]}}" style="width:100%;height:70%;">
+    <a href="/games/{{game[1]}}">
     <div class="w3-container w3-center">
-      <p>{{game[0]}}</p>
+      <p>{{game[1]}}</p>
     </div>
+    </a>
     </div>
-  </a>
 </div>
 {%endfor%}
 </div>
