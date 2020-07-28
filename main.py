@@ -29,8 +29,6 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
             flash('Invalid Username or Password')
     return render_template('login.html', Login_form=Login_form)
@@ -47,6 +45,7 @@ def register():
         return redirect(url_for("home"))
     Register_form = RegisterForm()
     if request.method == 'POST' and Register_form.validate_on_submit():
+        print("Test")
         name = Register_form.username.data
         password = generate_password_hash(Register_form.password.data,method='sha256',salt_length=8)
         try:
