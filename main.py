@@ -29,6 +29,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
+            return redirect(url_for("home"))
         else:
             flash('Invalid Username or Password')
     return render_template('login.html', Login_form=Login_form)
@@ -72,8 +73,8 @@ def register():
 def adddev():
     add_dev_form = AddDevForm()
     if request.method == "POST" and add_dev_form.validate_on_submit():
-        dev = add_dev_form.name.data
-        image = add_dev_form.image.data
+        dev = add_dev_form.name.data.strip()
+        image = add_dev_form.image.data.strip()
         entry = Developer(name=dev, logo=image)
         db.session.add(entry)
         db.session.commit()
@@ -122,6 +123,8 @@ def addgame():
         desc = add_game_form.desc.data
         video = add_game_form.video.data
         entry = Game(game_name, dev, link, price, image, desc, video)
+        user = db.session.query(User).filter_by(username=current_user.username).first()
+        user.games_added.append(entry)
         db.session.add(entry)
         db.session.commit()
     return render_template("addgame.html", add_game_form=add_game_form, devs=devs, dev_from_page=dev_from_page)

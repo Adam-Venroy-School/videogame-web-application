@@ -23,8 +23,9 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(40), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    reviews = db.relationship('Review', backref='user', lazy=True)
-    wishlist = db.relationship('Game', secondary=wishlist, backref=db.backref('user', lazy=True), lazy='subquery')
+    reviews = db.relationship('Review', backref='reviews', lazy=True)
+    wishlist = db.relationship('Game', secondary=wishlist, backref="user_wishlist", lazy='subquery')
+    games_added = db.relationship('Game')
 
     def __init__(self, username, password):
         self.username = username
@@ -52,6 +53,7 @@ class Game(db.Model):
     video = db.Column(db.String(40), nullable=True)
     reviews = db.relationship('Review', backref='game', lazy=True)
     game_awards = db.relationship('Award', secondary=game_awards, backref=db.backref('game', lazy=True), lazy='subquery')
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __init__(self, name, dev, link, price, image, desc, video):
         self.name = name
