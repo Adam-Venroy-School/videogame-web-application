@@ -122,8 +122,9 @@ def addgame():
         image = add_game_form.image.data
         desc = add_game_form.desc.data
         video = add_game_form.video.data
+        entry = Game(game_name, dev, link, price, image, desc, video)
         user = db.session.query(User).filter_by(username=current_user.username).first()
-        entry = Game(game_name, dev, link, price, image, desc, video, user.id)
+        user.games_added.append(entry)
         db.session.add(entry)
         db.session.commit()
     return render_template("addgame.html", add_game_form=add_game_form, devs=devs, dev_from_page=dev_from_page)
