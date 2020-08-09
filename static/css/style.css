@@ -85,6 +85,10 @@ div.content{
     min-height: 85vh;
     display: flex;
 }
+/* Login and Register Page  */
+div.login_register_errors{
+    max-height: 10px;
+}
 
 div.list{
     margin-top: 10px;
