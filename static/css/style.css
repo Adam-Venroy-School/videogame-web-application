@@ -26,6 +26,7 @@ ul.nav {
     padding: 10px;
     overflow: hidden;
     background-color: #333;
+    
 }
 
 li.sideheader{
@@ -38,6 +39,7 @@ li.sideheader{
 }
 
 li.nav {
+    color: gray;
     float: left;
     font-size: 20px;
     padding-right: 10px;

@@ -108,6 +108,39 @@ def user(username):
     print(wishlist_games)
     return render_template("userpage.html", wishlist_games=wishlist_games, added_games=added_games, user=user)
 
+@login_required
+@app.route("/user/<username>/changepassword", methods=['GET','POST'])
+def change_password(username):
+    if current_user.is_authenticated == False:
+        return redirect(url_for("home"))
+        
+    if db.session.query(User.username).filter_by(username=username).scalar() == None or username != current_user.username:
+        return redirect(url_for("error_page", error="change_password_error"))
+
+    password_form = ChangePasswordForm()
+    #Check forms are validated
+    print(add_game_form.dev.data)
+    if FormValidate(password_form):
+        print(current_user.password)
+        current_password = password_form.current_password.data
+        new_password = password_form.new_password.data
+        #Check if Password inputted in Current Password is correct
+        if check_password_hash(current_user.password, current_password) == False:
+            flash("Current Password is wrong")
+        else:
+            #Set new password to hash
+            new_password = generate_password_hash(new_password,method='sha256',salt_length=8)
+            #Set user's password to their new password
+            current_user.password = new_password
+            db.session.commit()
+            flash("Password Change Successful")
+    elif request.method == 'POST' and password_form.validate_on_submit() == False:
+        if password_form.new_password.data != password_form.password_confirm.data:
+            flash("Passwords did not match, try again.")
+        else:
+            flash("Ensure password is 8 characters.")
+    return render_template("change_password.html", username=username, password_form=password_form)
+
 @app.route("/adddev", methods=['GET', 'POST'])
 @login_required
 def adddev():
@@ -144,7 +177,7 @@ def dev(name):
         dev_games = db.session.query(Game).filter_by(dev=developer.name).all()
         print("DEV GAMES:", dev_games)
 
-    #If user is logged in, give option to add to wishlist
+    #If user is logged in, give option to add/remove to wishlist
     if current_user.is_authenticated:
         wishlist_games_id = db.session.query(wishlist).filter_by(user_id=current_user.id).all()
         print("WGI:", wishlist_games_id)
@@ -170,16 +203,17 @@ def addgame():
         print("DEVELOPER : {}".format(dev_from_page))
     else:
         dev_from_page = None
-        print(dev_from_page)
     #Making a list of all devs on the DB that can be selected
     devs = []
     for dev in Developer.query.order_by(Developer.name):
         devs.append((dev.name, dev.logo))
-    print(devs)
-    # Check if game name is anything that could break - such as home name
+    add_game_form.dev.choices = devs
+    print(add_game_form.dev.choices)
+
     if FormValidate(add_game_form):
         print("YES")
         game_name = add_game_form.name.data
+        # Check if game name is anything that could break - such as home name
         if game_name.upper().strip() in prohibited_names:
             return redirect(url_for("error_page", error="prohibited_name"))
         dev = add_game_form.dev.data
@@ -193,6 +227,8 @@ def addgame():
         user.games_added.append(entry)
         db.session.add(entry)
         db.session.commit()
+    print(add_game_form.errors)
+    print(FormValidate(add_game_form))
     return render_template("addgame.html", add_game_form=add_game_form, devs=devs, dev_from_page=dev_from_page)
 
 @app.route("/games", methods=['GET'])

@@ -13,9 +13,9 @@
                 {%endif%}
                 {% for dev in devs %}
                 {%if dev_from_page == dev[0]%}
-                <option value={{dev[0]}} SELECTED>{{dev[0]}}</option>
+                <option value="{{dev[0]}}" SELECTED>{{dev[0]}}</option>
                 {%else%}
-                <option value={{dev[0]}}>{{dev[0]}}</option>
+                <option value="{{dev[0]}}">{{dev[0]}}</option>
                 {%endif%}
                 {%endfor%}
             </select></p>
@@ -55,11 +55,12 @@
             Previous_Select.style.display = 'none'
         }
         var x = document.getElementById("dev_select").value;
+        console.log("X:", x)
         var logo = document.getElementById(x)
-        console.log(logo)
+        console.log("Logo:", logo)
         logo.style.display = 'block'
         Previous_Select = logo
-        console.log(Previous_Select)
+        console.log("Previous Select:", Previous_Select)
     }   
 </script>
 {% endblock %}
