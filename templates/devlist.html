@@ -1,16 +1,18 @@
 {% extends "layout.html"%}{% block content%}
 <div class="list">
+{% for x in range(0,100)%}
 {% for dev in devs.items()%}
 <div class="list-item" style="float:left;">
   <a href="/devs/{{dev[0]}}">
     <div class="w3-card-4" style="width:150px;height:210px;">
-      <img src="{{dev[1]}}" alt="{{dev[0]}}" style="width:100%;height:80%;">
+      <img src="{{url_for('static', filename=dev[1])}}" alt="{{dev[0]}}" style="width:100%;height:80%;">
     <div class="w3-container w3-center">
       <p>{{dev[0]}}</p>
     </div>
     </div>
   </a>
 </div>
+{%endfor%}
 {%endfor%}
 </div>
 {% endblock %}

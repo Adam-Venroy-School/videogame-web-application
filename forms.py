@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, DecimalField, SelectField, validators
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 
 class RegisterForm(FlaskForm):
     username = StringField('Username', [validators.Length(min=3, max=20)])
@@ -16,7 +17,7 @@ class AddGameForm(FlaskForm):
     dev = SelectField('Developer')
     link = StringField('Download Link',[validators.Length(max=200)])
     price = DecimalField('Price',[validators.NumberRange(max=999)])
-    image = StringField('Image', [validators.Length(max=9999)])
+    image = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png'], "Images only")])
     desc = StringField('Description', [validators.Length(max=400)])
     video = StringField('Video', [validators.Length(max=100)])
     add_game_submit = SubmitField("Add Game")
@@ -29,6 +30,6 @@ class ChangePasswordForm(FlaskForm):
     
 class AddDevForm(FlaskForm):
     name = StringField('Name', [validators.Length(min=1, max=40)])
-    image = StringField('Image', [validators.Length(max=9999)])
+    image = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png'], "Images only")])
     add_dev_submit = SubmitField("Add Developer")
     

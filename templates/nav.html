@@ -1,14 +1,14 @@
 <ul class="nav">
-    <li class=nav><a href="/home">Home</a></li>
-    <li class=nav><a href="/games">Games</a></li>
-    <li class=nav><a href="/devs">Developers</a></li>
+    <li class="w3-bar-item w3-button w3-mobile"><a href="/home">Home</a></li>
+    <li class="w3-bar-item w3-button w3-mobile"><a href="/games">Games</a></li>
+    <li class="w3-bar-item w3-button w3-mobile"><a href="/devs">Developers</a></li>
     <li class="sideheader">Games 2 Play</li>
     {% if current_user.is_authenticated == false %}
-    <li class="nav"><a href="/register">Register</a></li>
-    <li class="nav"><a href="/login">Login</a></li>
+    <li class="w3-bar-item w3-button w3-mobile"><a href="/register">Register</a></li>
+    <li class="w3-bar-item w3-button w3-mobile"><a href="/login">Login</a></li>
     {% else %}
-    <li class="nav"><a href="/addgame">Add Game</a></li>
-    <li class="nav"><a href="/adddev">Add Developer</a></li>
+    <li class="w3-bar-item w3-button w3-mobile"><a href="/addgame">Add Game</a></li>
+    <li class="w3-bar-item w3-button w3-mobile"><a href="/adddev">Add Developer</a></li>
     <li class="log_out"><a href="/logout">Log out</a></li>
     <li class="logged_in">{{current_user.username}}</li>
     {% endif %}

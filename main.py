@@ -3,6 +3,7 @@ from models import *
 from forms import *
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
 login_manager = LoginManager()
@@ -147,10 +148,20 @@ def adddev():
     add_dev_form = AddDevForm()
     #Validate Form and if it returns true, add entry to
     if FormValidate(add_dev_form):
+        print("VALIDATION PASSED")
         dev = add_dev_form.name.data.strip()
         if dev.upper() in prohibited_names:
             return(redirect(url_for("error_page", error="prohibited_name")))
-        image = add_dev_form.image.data.strip()
+        if add_dev_form.image.data:
+            image = add_dev_form.image.data
+            image_name = dev.replace(" ", "") + ".jpg"
+            #Save game image in game directory
+            image.save(os.path.join(project_dir, "static/images/dev_images", image_name))
+            #Change image to source of img
+            image = "images/dev_images/" + image_name
+            print(image)
+        else:
+            image = None
         entry = Developer(name=dev, logo=image)
         db.session.add(entry)
         db.session.commit()
@@ -214,19 +225,36 @@ def addgame():
         print("YES")
         game_name = add_game_form.name.data
         # Check if game name is anything that could break - such as home name
-        if game_name.upper().strip() in prohibited_names:
+        if game_name.upper().strip() in prohibited_names or game_name in db.session.query(User.username).all():
             return redirect(url_for("error_page", error="prohibited_name"))
         dev = add_game_form.dev.data
         link = add_game_form.link.data
         price = add_game_form.price.data
-        image = add_game_form.image.data
+        #Check if user uploaded image
+        if add_game_form.image.data:
+            image = add_game_form.image.data
+            image_name = game_name.replace(" ", "") + ".jpg"
+            #Save game image in game directory
+            image.save(os.path.join(project_dir, "static/images/game_images", image_name))
+            #Change image to source of img
+            image = "images/game_images/" + image_name
+            print(image)
+        else:
+            image = None
         desc = add_game_form.desc.data
         video = add_game_form.video.data
         entry = Game(game_name, dev, link, price, image, desc, video)
-        user = db.session.query(User).filter_by(username=current_user.username).first()
-        user.games_added.append(entry)
-        db.session.add(entry)
-        db.session.commit()
+        try:
+            user = db.session.query(User).filter_by(username=current_user.username).first()
+            user.games_added.append(entry)
+            db.session.add(entry)
+            db.session.flush()
+        except IntegrityError:
+            flash("Game has already been added")
+            db.session.rollback()
+            return render_template("addgame.html", add_game_form=add_game_form, devs=devs, dev_from_page=dev_from_page)
+        else:
+            db.session.commit
     print(add_game_form.errors)
     print(FormValidate(add_game_form))
     return render_template("addgame.html", add_game_form=add_game_form, devs=devs, dev_from_page=dev_from_page)
@@ -300,7 +328,7 @@ def error_page():
         return redirect(url_for("home"))
     return render_template("errorpage.html", error=error)
     
-#Redirects pages that dont exist to home
+#Redirects urls that dont exist to error page
 @app.errorhandler(404)
 def page_not_found(e):
     return redirect(url_for("error_page", error="404"))
@@ -312,5 +340,3 @@ def auth_error():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-

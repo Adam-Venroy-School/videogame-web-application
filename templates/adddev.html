@@ -3,11 +3,11 @@
 <div class="w3-container w3-half w3-margin-top">
     <div class="w3-panel w3-card">
         <p>Add Dev:</p>
-        <form method="POST" action=''>
+        <form method="POST" action='' enctype="multipart/form-data">
             {{add_dev_form.csrf_token }}
             <p><input class="w3-input" type="text" name="name">Developer Name</input></p>
             <br>
-            <p><input class="w3-input" type="text" name="image">Image Link</input></p>
+            <p><input class="w3-input" name="image" type="file">Developer Logo</input></p>
             <br>
             <p><button class="w3-button w3-section w3-grey w3-ripple" name="add_dev_submit">Add Developer</button></p>
         </form>

@@ -59,11 +59,6 @@ li a:hover {
 }
 
 
-div.loginregister{
-    text-align: center;
-    margin-top: 40px;
-}
-
 .logged_in{
     font-size: 20px;
     display: block;
@@ -83,20 +78,25 @@ div.loginregister{
     float: right;
     padding-right: 5px;
 }
+
+div.validation_errors{
+    max-height: 10px;
+    padding-bottom: 20px;
+}
+
 div.content{
     min-height: 85vh;
     display: flex;
 }
-/* Login and Register Page  */
-div.login_register_errors{
-    max-height: 10px;
-}
 
+/* List for Devs and Games */
 div.list{
     margin-top: 10px;
     margin-left: 70px;
     margin-right: 10px;
 }
+
+/* Button for adding and removing games to wishlist */
 img.add_remove_button{
     position: absolute;
     top: 0px;
@@ -105,10 +105,12 @@ img.add_remove_button{
     width: 20px;
 }
 
+/* Dev Page */
 div.dev-sidepanel{
     float: left;
     margin-left: 20px;
     margin-top: 20px;
+    max-height: 500px;
     text-align: center;
 }
 
@@ -131,6 +133,7 @@ div.dev-list{
     margin-top: 20px;
 }
 
+/* Footer */
 footer{
     padding: 10px;
     font-size: 20px;

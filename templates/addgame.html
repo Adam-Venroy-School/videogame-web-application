@@ -3,7 +3,7 @@
 <div class="w3-container w3-half w3-margin-top">
     <div class="w3-panel w3-card">
         <p>Add Game:</p>
-        <form method="POST" action=''>
+        <form method="POST" action='' enctype="multipart/form-data">
             {{add_game_form.csrf_token }}
             <p><input class="w3-input" type="text" name="name">Game Name</input></p>
             <br>
@@ -25,7 +25,7 @@
             <br>
             <p><input class="w3-input" type="number" min=0 step="0.01" name="price">Price</p></input></p>
             <br>
-            <p><input class="w3-input" name="image">Image Link</p></input></p>
+            <p><input class="w3-input" name="image" type="file"></input></p>
             <br>
             <p><input class="w3-input" name="video">Video Link</p></input></p>
             <br>
@@ -38,12 +38,12 @@
 
 {% for dev in devs%}
 {%if dev[0] == dev_from_page%}
-<img class="dev_logo" src="{{dev[1]}}" id='{{dev[0]}}' style='display:block;'></img>
+<img class="dev_logo" src="{{url_for('static', filename=dev[1])}}" id='{{dev[0]}}' style='display:block;'></img>
 <script>
     Previous_Select = document.getElementById("{{dev[0]}}")
 </script>
 {%else%}
-<img class="dev_logo" src="{{dev[1]}}" id='{{dev[0]}}' style='display:none;'></img>
+<img class="dev_logo" src="{{url_for('static', filename=dev[1])}}" id='{{dev[0]}}' style='display:none;'></img>
 {%endif%}
 {%endfor%}
 <script>

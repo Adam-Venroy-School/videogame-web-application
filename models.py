@@ -44,7 +44,7 @@ class Developer(db.Model):
 class Game(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40), nullable=False)
+    name = db.Column(db.String(40), nullable=False, unique=True)
     dev = db.Column(db.String, db.ForeignKey('developer.name'), nullable=False)
     link = db.Column(db.String(200), nullable=False)
     price = db.Column(db.Float(6), nullable=False)
