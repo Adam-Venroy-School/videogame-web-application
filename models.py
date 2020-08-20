@@ -9,15 +9,18 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(os.path.join(project_dir,'website.db'))
 db = SQLAlchemy(app)
 
+
 game_awards = (db.Table('awards',
             db.Column('award_id', db.Integer, db.ForeignKey('award.id'), primary_key=True),
             db.Column('game_id', db.Integer, db.ForeignKey('game.id'), primary_key=True))
 )
 
+# Intermediate Table for Games and Users
 wishlist = (db.Table('wishlist',    
             db.Column('game_id', db.Integer, db.ForeignKey('game.id'), primary_key=True), 
             db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True))
 )
+
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -32,7 +35,6 @@ class User(db.Model, UserMixin):
         self.password = password
 
 class Developer(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), nullable=False)
     logo = db.Column(db.String(40), nullable=True)
@@ -65,7 +67,6 @@ class Game(db.Model):
         self.video = video
 
 class Review(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
     reviewer = db.Column(db.String, db.ForeignKey('user.username'), nullable=False)
     game_name = db.Column(db.String, db.ForeignKey('game.name'), nullable=False)

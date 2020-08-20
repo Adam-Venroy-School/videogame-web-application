@@ -5,9 +5,11 @@
         <p>Add Dev:</p>
         <form method="POST" action='' enctype="multipart/form-data">
             {{add_dev_form.csrf_token }}
-            <p><input class="w3-input" type="text" name="name">Developer Name</input></p>
+            <label>Developer:</label>
+            <input class="w3-input" type="text" name="name"></input>
             <br>
-            <p><input class="w3-input" name="image" type="file">Developer Logo</input></p>
+            <label>Logo:</label>
+            <input class="w3-input" name="image" type="file"></input>
             <br>
             <p><button class="w3-button w3-section w3-grey w3-ripple" name="add_dev_submit">Add Developer</button></p>
         </form>

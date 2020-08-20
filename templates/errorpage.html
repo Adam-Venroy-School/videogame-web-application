@@ -1,14 +1,15 @@
 {% extends "layout.html"%}{% block content %}
-
 <div class="error_message">
     {%if error == "404"%}
-    <p>Error 404: Page not found</p>
+    <p>Error 404: Page not found.</p>
     {%elif error == "wishlist"%}
-    <p>Wishlist Error: Failed to add entry</p>
+    <p>Wishlist Error: Failed to add entry.</p>
     {%elif error == "prohibited_name"%}
-    <p>Name Error: Name is not allowed</p>
+    <p>Name Error: Name is not allowed.</p>
+    {%elif error == "user_not_found"%}
+    <p>User Error: User was not found.</p>
     {%else%}
-    <p>Unknown Error: Please try again</p>
+    <p>Unknown Error: Please try again.</p>
     {%endif%}
 </div>
 {% endblock %}

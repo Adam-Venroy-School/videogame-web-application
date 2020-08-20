@@ -1,3 +1,45 @@
 {% extends "layout.html"%}{% block content %}
+{% from "macro.html" import game_item with context %}
+<div class="sidepanel">
+    <div class="w3-card-4" style="height:270px;margin-bottom:10px;">
+        <img src="{{url_for('static', filename='images/user/user.jpg')}}" alt="{{user['username']}}" style="width:250px;height:200px;">
+        <div class="w3-container w3-center">
+            <p>{{user['username']}}</p>
+        </div>
+    </div>
+</div>
 
+<div class="userpage_buttons">
+<button class="w3-button w3-gray" onclick="ShowHide('wishlist')">Wishlist</button> 
+<button class="w3-button w3-gray" onclick="ShowHide('added_games')">Added Games</button> 
+</div>
+<div class="userpage_list" id="wishlist" style="display:none">
+    {%for game in wishlist_games%}
+    {{game_item(page='games', game=game)}}
+    {%endfor%}
+</div>
+<div class="userpage_list" id='added_games' style='display:none'>
+    {%for game in added_games%}
+    {{game_item(page='games', game=game)}}
+    {%endfor%}
+</div>
+<script>
+    const lists = ['wishlist', 'added_games'];
+    function ShowHide(list){
+        for(var i = 0; i < lists.length; i++){
+            if(lists[i]==list){
+                list = document.getElementById(list)
+                list.style.display='block'
+                list.style.border_color='black'
+            }
+            else{
+                x = document.getElementById(lists[i])
+                x.style.display='none'
+                x.style.border_color='none'
+            }
+        }
+
+
+    }
+</script>
 {% endblock %}

@@ -1,9 +1,9 @@
 from flask import render_template, redirect, url_for, request, flash, Flask, request
 from models import *
 from forms import *
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
 login_manager = LoginManager()
@@ -93,34 +93,34 @@ def user(username):
         print("User not found")
         return redirect(url_for("error_page", error="user_not_found"))
 
-
     user = db.session.query(User).filter_by(username=username).one()
 
     wishlist_games = []
+    #Get all rows with user ID
     wishlist_games_id = db.session.query(wishlist).filter_by(user_id=user.id).all()
+    #Set table to only have game IDs
     wishlist_games_id = [x[0] for x in wishlist_games_id]
     gamelist = Game.query.all()
+    #For every game, check if its id is in users wishlist and add it to table - Lets us get more data about game
     for game in gamelist:
         if game.id in wishlist_games_id:
             wishlist_games.append(db.session.query(Game).filter_by(id=game.id).all()[0])
 
     added_games = db.session.query(Game).filter_by(user_id=user.id).all()
-    print(added_games)
-    print(wishlist_games)
-    return render_template("userpage.html", wishlist_games=wishlist_games, added_games=added_games, user=user)
+    print("ADDED GAMES", added_games)
+    print(user.username,"WISHLIST:", wishlist_games)
+    print("VIEWER WISHLIST:", wishlist_games_id)
+    return render_template("userpage.html", wishlist_games=wishlist_games, added_games=added_games, user=user, wishlist_games_id=wishlist_games_id)
 
 @login_required
-@app.route("/user/<username>/changepassword", methods=['GET','POST'])
-def change_password(username):
+@app.route("/changepassword", methods=['GET','POST'])
+def change_password():
+    #If user is not logged in and they access, return home
     if current_user.is_authenticated == False:
         return redirect(url_for("home"))
-        
-    if db.session.query(User.username).filter_by(username=username).scalar() == None or username != current_user.username:
-        return redirect(url_for("error_page", error="change_password_error"))
 
     password_form = ChangePasswordForm()
     #Check forms are validated
-    print(add_game_form.dev.data)
     if FormValidate(password_form):
         print(current_user.password)
         current_password = password_form.current_password.data
@@ -135,12 +135,13 @@ def change_password(username):
             current_user.password = new_password
             db.session.commit()
             flash("Password Change Successful")
+    #If validation failed, find out why and flash error.
     elif request.method == 'POST' and password_form.validate_on_submit() == False:
         if password_form.new_password.data != password_form.password_confirm.data:
             flash("Passwords did not match, try again.")
         else:
             flash("Ensure password is 8 characters.")
-    return render_template("change_password.html", username=username, password_form=password_form)
+    return render_template("change_password.html", password_form=password_form)
 
 @app.route("/adddev", methods=['GET', 'POST'])
 @login_required
@@ -152,6 +153,9 @@ def adddev():
         dev = add_dev_form.name.data.strip()
         if dev.upper() in prohibited_names:
             return(redirect(url_for("error_page", error="prohibited_name")))
+        if db.session.query(Developer).filter(func.lower(Developer.name)==dev.lower()).scalar():
+            flash("Error: Dev already added")
+            return render_template("adddev.html", add_dev_form=add_dev_form)
         if add_dev_form.image.data:
             image = add_dev_form.image.data
             image_name = dev.replace(" ", "") + ".jpg"
@@ -190,19 +194,13 @@ def dev(name):
 
     #If user is logged in, give option to add/remove to wishlist
     if current_user.is_authenticated:
-        wishlist_games_id = db.session.query(wishlist).filter_by(user_id=current_user.id).all()
-        print("WGI:", wishlist_games_id)
-        wishlist_games_id = [x[0] for x in wishlist_games_id]
-        print("WGI", wishlist_games_id)
+        wishlist_games = db.session.query(wishlist).filter_by(user_id=current_user.id).all()
+        print("WGI:", wishlist_games)
+        wishlist_games_id = [x[0] for x in wishlist_games]
+        print("WGI", wishlist_games)
         gamelist = Game.query.all()
         #For Loop that searches all games and checks if in user wishlist
-        for game in gamelist:
-            print("GAME ID:", game.id)
-            print(wishlist_games_id)
-            if game.id in wishlist_games_id:
-                wishlist_games.append(db.session.query(Game).filter_by(id=game.id).all()[0])
-                print("USER WISHLIST:", wishlist_games)
-    return render_template("dev.html", name=name, developer=developer, dev_games=dev_games, wishlist_games=wishlist_games)
+    return render_template("dev.html", name=name, developer=developer, dev_games=dev_games, wishlist_games_id=wishlist_games_id)
 
 @app.route("/addgame", methods=['GET', 'POST'])
 @login_required
@@ -244,17 +242,20 @@ def addgame():
         desc = add_game_form.desc.data
         video = add_game_form.video.data
         entry = Game(game_name, dev, link, price, image, desc, video)
+        #Attempt to add entry to database
         try:
             user = db.session.query(User).filter_by(username=current_user.username).first()
             user.games_added.append(entry)
             db.session.add(entry)
             db.session.flush()
+        #If integrity error (game_name is already entered) occurs, flash and do not add
         except IntegrityError:
             flash("Game has already been added")
             db.session.rollback()
             return render_template("addgame.html", add_game_form=add_game_form, devs=devs, dev_from_page=dev_from_page)
         else:
-            db.session.commit
+            print("GAME ADDED")
+            db.session.commit()
     print(add_game_form.errors)
     print(FormValidate(add_game_form))
     return render_template("addgame.html", add_game_form=add_game_form, devs=devs, dev_from_page=dev_from_page)
@@ -262,18 +263,16 @@ def addgame():
 @app.route("/games", methods=['GET'])
 def games():
     games=[]
-    gamelist = Game.query.all()
-    wishlist_games = ['']
-    #Gets all games in the database
-    for game in gamelist:
-        games.append((game.id, game.name, game.dev, game.image))
+    gamelist = db.session.query(Game).all()
+    wishlist_games = []
     #If the User is logged in, check every game to see if on wishlist.
+    wishlist_games_id = []
     if current_user.is_authenticated:
         wishlist_games = db.session.query(wishlist).filter_by(user_id=current_user.id).all()
         print("WG:", wishlist_games)
-        wishlist_games = [x[0] for x in wishlist_games]
+        wishlist_games_id = [x[0] for x in wishlist_games]
         print("WG:", wishlist_games)
-    return render_template('games.html', games=games, wishlist_games=wishlist_games)
+    return render_template('games.html', gamelist=gamelist, wishlist_games_id=wishlist_games_id)
 
 @login_required
 @app.route("/wishlist/add/<id>")

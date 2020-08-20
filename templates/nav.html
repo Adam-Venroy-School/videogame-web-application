@@ -1,15 +1,16 @@
 <ul class="nav">
-    <li class="w3-bar-item w3-button w3-mobile"><a href="/home">Home</a></li>
-    <li class="w3-bar-item w3-button w3-mobile"><a href="/games">Games</a></li>
-    <li class="w3-bar-item w3-button w3-mobile"><a href="/devs">Developers</a></li>
+    <a href="/home"><li class="w3-bar-item w3-button w3-mobile">Home</li></a>
+    <a href="/games"><li class="w3-bar-item w3-button w3-mobile">Games</li></a>
+    <a href="/devs"><li class="w3-bar-item w3-button w3-mobile">Developers</li></a>
     <li class="sideheader">Games 2 Play</li>
     {% if current_user.is_authenticated == false %}
-    <li class="w3-bar-item w3-button w3-mobile"><a href="/register">Register</a></li>
-    <li class="w3-bar-item w3-button w3-mobile"><a href="/login">Login</a></li>
+    <a href="/register"><li class="w3-bar-item w3-button w3-mobile">Register</li></a>
+    <a href="/login"><li class="w3-bar-item w3-button w3-mobile">Login</li></a>
     {% else %}
-    <li class="w3-bar-item w3-button w3-mobile"><a href="/addgame">Add Game</a></li>
-    <li class="w3-bar-item w3-button w3-mobile"><a href="/adddev">Add Developer</a></li>
-    <li class="log_out"><a href="/logout">Log out</a></li>
+    <a href="/addgame"><li class="w3-bar-item w3-button w3-mobile">Add Game</li></a>
+    <a href="/adddev"><li class="w3-bar-item w3-button w3-mobile">Add Developer</li></a>
+    <a href="/logout"><li class="log_out"><a href="/logout">Log out</li></a>
     <li class="logged_in">{{current_user.username}}</li>
+    <a href="/user/{{current_user.username}}"><li class="w3-bar-item w3-button w3-mobile" style="float:right;">User Page</li></a>
     {% endif %}
 </ul>

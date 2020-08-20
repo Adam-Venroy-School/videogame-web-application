@@ -5,9 +5,11 @@
         <p>Add Game:</p>
         <form method="POST" action='' enctype="multipart/form-data">
             {{add_game_form.csrf_token }}
-            <p><input class="w3-input" type="text" name="name">Game Name</input></p>
+            <label>Game Name:</label>
+            <input class="w3-input" type="text" name="name"></input>
             <br>
-            <p><select id="dev_select" name="dev" onchange="myFunction()">
+            <label>Developer:</label>
+            <select id="dev_select" name="dev" onchange="myFunction()">
                 {% if dev_from_page == None%}
                 <option>PLEASE SELECT A DEVELOPER</option>
                 {%endif%}
@@ -18,18 +20,23 @@
                 <option value="{{dev[0]}}">{{dev[0]}}</option>
                 {%endif%}
                 {%endfor%}
-            </select></p>
-            <p>Developer</p>
+            </select>
             <br>
-            <p><input class="w3-input" name="link">Store/Download Link</p></input></p>
             <br>
-            <p><input class="w3-input" type="number" min=0 step="0.01" name="price">Price</p></input></p>
+            <label>Download/Store Link:</label>
+            <input class="w3-input" name="link"></input>
             <br>
-            <p><input class="w3-input" name="image" type="file"></input></p>
+            <label>Price:</label>
+            <input class="w3-input" type="number" min=0 step="0.01" name="price"></input>
             <br>
-            <p><input class="w3-input" name="video">Video Link</p></input></p>
+            <label>Image:</label>
+            <input class="w3-input" name="image" type="file"></input>
             <br>
-            <p><input class="w3-input" name="desc">Description</p></input></p>
+            <label>Video:</label>
+            <input class="w3-input" name="video"></input>
+            <br>
+            <label>Description:</label>
+            <input class="w3-input" name="desc"></input>
             <br>
             <p><button class="w3-button w3-section w3-grey w3-ripple" name="add_game_submit">Add Game</button></p>
         </form>

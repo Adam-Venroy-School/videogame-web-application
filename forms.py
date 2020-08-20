@@ -15,10 +15,10 @@ class LoginForm(FlaskForm):
 class AddGameForm(FlaskForm):
     name = StringField('Name', [validators.Length(min=1, max=100)])
     dev = SelectField('Developer')
-    link = StringField('Download Link',[validators.Length(max=200)])
+    link = StringField('Download Link',[validators.Length(max=400)])
     price = DecimalField('Price',[validators.NumberRange(max=999)])
     image = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png'], "Images only")])
-    desc = StringField('Description', [validators.Length(max=400)])
+    desc = StringField('Description', [validators.Length(max=1000)])
     video = StringField('Video', [validators.Length(max=100)])
     add_game_submit = SubmitField("Add Game")
 

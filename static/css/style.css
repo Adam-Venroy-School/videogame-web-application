@@ -44,20 +44,6 @@ li.nav {
     font-size: 20px;
     padding-right: 10px;
 }
-  
-li a.nav {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    color:inherit;
-  }
-  
-li a:hover {
-    background-color: #111;
-}
-
 
 .logged_in{
     font-size: 20px;
@@ -88,6 +74,17 @@ div.content{
     min-height: 85vh;
     display: flex;
 }
+/* Home Page*/
+div.title{
+    display:block;
+    max-height: 900px;
+    width:100%;
+}
+div.homepage_buttons{
+    display:block;
+    clear:both;
+}
+
 
 /* List for Devs and Games */
 div.list{
@@ -106,7 +103,7 @@ img.add_remove_button{
 }
 
 /* Dev Page */
-div.dev-sidepanel{
+div.sidepanel{
     float: left;
     margin-left: 20px;
     margin-top: 20px;
@@ -130,6 +127,14 @@ img.dev_logo{
 
 div.dev-list{
     margin-left: 30px;
+    margin-top: 20px;
+}
+
+/*User Page*/
+div.userpage_buttons{
+    max-height: 80px;
+    width: 500px;
+    margin-left: 20px;
     margin-top: 20px;
 }
 
