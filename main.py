@@ -5,6 +5,7 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
+from ast import literal_eval
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -18,6 +19,28 @@ def FormValidate(form):
         return True
     else:
         return False
+
+def ReturnPage(backpage):
+    try:
+        backpage = literal_eval(backpage)
+    except SyntaxError:
+        return redirect(url_for("home"))
+    if 'user' in backpage:
+        print(backpage['user'])
+        page = backpage['user']
+        if 'shown_list' in backpage:
+            return redirect(url_for('user', username=page, shown_list=backpage['shown_list']))
+        return redirect(url_for("user", username=page))
+    elif 'dev' in backpage:
+        print(backpage['dev'])
+        page = backpage['dev']
+        return redirect(url_for("dev", name=page))
+    elif 'game' in backpage:
+        print(backpage['game'])
+        page = backpage['game']
+        return redirect(url_for("game", name=page))
+    else:
+        return redirect(url_for('games'))
 
 @login_manager.user_loader
 def get_user(user_id):
@@ -42,7 +65,8 @@ def login():
         # Check if user is true and that password input is equal to password stored in DB
         if user and check_password_hash(user.password, password):
             login_user(user)
-            return redirect(url_for("home"))
+            flash("Login Successful")
+            return render_template('login.html', Login_form=Login_form)
         else:
             flash('Invalid Username or Password')
     return render_template('login.html', Login_form=Login_form)
@@ -88,29 +112,44 @@ def register():
 
 @app.route("/user/<username>", methods=['GET', 'POST'])
 def user(username):
+    if request.args.get('shown_list', None):
+        shown_list = request.args.get('shown_list', None)
+        print("LIST : {}".format(shown_list))
+    else:
+        shown_list = None
     #Check to see if User is in DB
     if db.session.query(User.username).filter_by(username=username).scalar() == None:
         print("User not found")
         return redirect(url_for("error_page", error="user_not_found"))
 
     user = db.session.query(User).filter_by(username=username).one()
-
+    user_page_wishlist = []
     wishlist_games = []
-    #Get all rows with user ID
-    wishlist_games_id = db.session.query(wishlist).filter_by(user_id=user.id).all()
-    #Set table to only have game IDs
-    wishlist_games_id = [x[0] for x in wishlist_games_id]
-    gamelist = Game.query.all()
-    #For every game, check if its id is in users wishlist and add it to table - Lets us get more data about game
-    for game in gamelist:
-        if game.id in wishlist_games_id:
-            wishlist_games.append(db.session.query(Game).filter_by(id=game.id).all()[0])
+    wishlist_games_id = []
+    # Get game ids of the games in the user that we are viewings wishlist
+    user_page_wishlist_id = db.session.query(wishlist).filter_by(user_id=user.id).all()
+    print(user_page_wishlist_id)
+    user_page_wishlist_id = [x[0] for x in user_page_wishlist_id]
+    print(user_page_wishlist_id)
+    for id in user_page_wishlist_id:
+        game = db.session.query(Game).filter_by(id=id).one()
+        user_page_wishlist.append(game)
+    print('USER WISHLIST:', user_page_wishlist)
+        
+    # Get game ids of the games in the CURRENT user wishlist.
+    if current_user.is_authenticated:    
+        wishlist_games_id = db.session.query(wishlist).filter_by(user_id=current_user.id).all()
+        wishlist_games_id = [x[0] for x in wishlist_games_id]
+        gamelist = Game.query.all()
+        for game in gamelist:
+            if game.id in wishlist_games_id:
+                wishlist_games.append(db.session.query(Game).filter_by(id=game.id).all()[0])
 
     added_games = db.session.query(Game).filter_by(user_id=user.id).all()
     print("ADDED GAMES", added_games)
-    print(user.username,"WISHLIST:", wishlist_games)
-    print("VIEWER WISHLIST:", wishlist_games_id)
-    return render_template("userpage.html", wishlist_games=wishlist_games, added_games=added_games, user=user, wishlist_games_id=wishlist_games_id)
+    print(user.username,"WISHLIST:", user_page_wishlist)
+    print("VIEWER WISHLIST:", wishlist_games)
+    return render_template("userpage.html", wishlist_games=wishlist_games, added_games=added_games, user=user, wishlist_games_id=wishlist_games_id, shown_list=shown_list, user_page_wishlist=user_page_wishlist)
 
 @login_required
 @app.route("/changepassword", methods=['GET','POST'])
@@ -167,8 +206,15 @@ def adddev():
         else:
             image = None
         entry = Developer(name=dev, logo=image)
-        db.session.add(entry)
-        db.session.commit()
+        try:
+            db.session.add(entry)
+            db.session.flush()
+        except:
+            db.session.rollback()
+            flash('Error: Unable to add Developer')
+        else:
+            db.session.commit()
+            flash("%s successfully added" % entry.name)
     return render_template("adddev.html", add_dev_form=add_dev_form)
 
 @app.route("/devs", methods=['GET'])
@@ -183,6 +229,7 @@ def devlist():
 @app.route("/devs/<name>", methods=['GET'])
 def dev(name):
     wishlist_games = []
+    wishlist_games_id = []
     #Check if Developer exists - if false, return to error page
     if db.session.query(Developer.name).filter_by(name=name).scalar() == None:
         print("Dev not found")
@@ -254,8 +301,22 @@ def addgame():
             db.session.rollback()
             return render_template("addgame.html", add_game_form=add_game_form, devs=devs, dev_from_page=dev_from_page)
         else:
+            flash('Game has been successfully added!')
             print("GAME ADDED")
             db.session.commit()
+    elif request.method == 'POST' and add_game_form.validate_on_submit() == False:
+        if 'name' in add_game_form.errors:
+            flash("Game name needs to be between 1 and 100 characters") 
+        if 'link' in add_game_form.errors:
+            flash("Link needs to be less than 400 characters - Please use a link shortner")
+        if 'price' in add_game_form.errors:
+            flash("Price is too high.")
+        if 'description' in add_game_form.errors:
+            flash("Description is too long")
+        if 'video' in add_game_form.errors:
+            flash("Video Link is too long.")
+        if len(add_game_form.errors) == 0:
+            flash('Unknown Error')
     print(add_game_form.errors)
     print(FormValidate(add_game_form))
     return render_template("addgame.html", add_game_form=add_game_form, devs=devs, dev_from_page=dev_from_page)
@@ -277,25 +338,24 @@ def games():
 @login_required
 @app.route("/wishlist/add/<id>")
 def add_wishlist(id):
+    #Get Game ID
     game = db.session.query(Game).filter_by(id=id).first()
     user = current_user
     backpage = request.args.get('backpage')
     print("BP:", backpage)
     try:
+        #Add to user's wishlist the game
         user.wishlist.append(game)
         db.session.flush()
     except:
+        #If adding fails, return to error page
         db.session.rollback()
         return redirect(url_for("error_page", error="wishlist"))
     # Checks what page the User came from :
     db.session.commit()
-    if backpage:
-        if backpage.upper() not in prohibited_names:
-            url = ('/devs/%s' % backpage)
-            return redirect(url)
-        elif backpage.upper() == "GAMES":
-            return redirect(url_for("games"))
-    return redirect(url_for('home'))
+    page = ReturnPage(backpage)
+    return page
+
 
 @login_required
 @app.route("/wishlist/remove/<id>")
@@ -304,6 +364,7 @@ def remove_wishlist(id):
     game = db.session.query(Game).filter_by(id=id).first()
     backpage = request.args.get('backpage')
     print("BP:", backpage)
+    print(backpage[1])
     try:
         user.wishlist.remove(game)
         db.session.flush()
@@ -312,13 +373,35 @@ def remove_wishlist(id):
         return redirect(url_for("error_page", error="wishlist"))
     db.session.commit()
     # Checks what page the User came from :
-    if backpage:
-        if backpage.upper() not in prohibited_names:
-            url = ('/devs/%s' % backpage)
-            return redirect(url)
-        elif backpage.upper() == "GAMES":
-            return redirect(url_for("games"))
-    return redirect(url_for('home'))
+    page = ReturnPage(backpage)
+    return page
+
+@app.route("/deletegame/<game>")
+@login_required
+def deletegame(game):
+    backpage = request.args.get('backpage')
+    user = current_user
+    game = db.session.query(Game).filter_by(name=game).first()
+    if game == None:
+        return redirect(url_for("error_page", error='game_not_found'))
+    if current_user.id == game.user_id or current_user.username == 'admin':
+        try:
+            db.session.delete(game)
+            db.session.flush()
+        except:
+            db.session.rollback()
+            return redirect(url_for('error_page', error='delete'))
+        else:
+            os.remove('static/' + game.image)
+            db.session.commit()
+        if backpage:
+            page = ReturnPage(backpage)
+            return page
+        else:
+            return redirect(url_for('home'))
+    else:
+        print('FAILED USER CHECK')
+        return redirect(url_for('error_page', error='delete'))
 
 @app.route("/error", methods=['GET'])
 def error_page():

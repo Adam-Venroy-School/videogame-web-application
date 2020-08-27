@@ -2,7 +2,7 @@
 {% from "macro.html" import game_item with context %}
 <div class="list">
 {% for game in gamelist%}
-{{game_item(page='games', game=game)}}
+{{game_item(page={"games" : ''}, game=game)}}
 {%endfor%}
 </div>
 {% endblock %}

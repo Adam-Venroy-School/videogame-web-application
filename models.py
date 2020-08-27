@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os.path
+import os
 from flask_login import UserMixin
 
 project_dir = os.path.dirname(os.path.abspath(__file__))

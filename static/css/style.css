@@ -19,6 +19,9 @@ body{
 }
 
 /* Nav Bar */
+a[onclick] { 
+    cursor: pointer 
+}
 
 ul.nav {
     list-style-type: none;
@@ -101,6 +104,15 @@ img.add_remove_button{
     height: 20px;
     width: 20px;
 }
+/* Delete Game Button */
+img.delete_button{
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    height: 20px;
+    width: 20px;
+}
+
 
 /* Dev Page */
 div.sidepanel{
@@ -136,6 +148,11 @@ div.userpage_buttons{
     width: 500px;
     margin-left: 20px;
     margin-top: 20px;
+    float: left;
+}
+
+div.userpage_lists{
+    clear: both;
 }
 
 /* Footer */

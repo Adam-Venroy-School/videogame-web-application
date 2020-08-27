@@ -7,20 +7,29 @@
             <p>{{user['username']}}</p>
         </div>
     </div>
+    {%if user == current_user%}
+    <a href="{{url_for('change_password')}}">
+        <div class="w3-card" style="max-height:10%;padding: 10px;">
+            <p>Change Password</p>
+        </div>
+    </a>
+    {%endif%}
 </div>
 
 <div class="userpage_buttons">
 <button class="w3-button w3-gray" onclick="ShowHide('wishlist')">Wishlist</button> 
 <button class="w3-button w3-gray" onclick="ShowHide('added_games')">Added Games</button> 
 </div>
+
 <div class="userpage_list" id="wishlist" style="display:none">
-    {%for game in wishlist_games%}
-    {{game_item(page='games', game=game)}}
+    {%for game in user_page_wishlist%}
+    {{game_item(page={"user" : user['username'], "shown_list" : "wishlist"}, game=game)}}
     {%endfor%}
 </div>
+
 <div class="userpage_list" id='added_games' style='display:none'>
     {%for game in added_games%}
-    {{game_item(page='games', game=game)}}
+    {{game_item(page={"user" : user['username'],  "shown_list" : "added_games"}, game=game)}}
     {%endfor%}
 </div>
 <script>
@@ -30,16 +39,23 @@
             if(lists[i]==list){
                 list = document.getElementById(list)
                 list.style.display='block'
-                list.style.border_color='black'
+                button = lists[i] + '_button'
             }
             else{
                 x = document.getElementById(lists[i])
                 x.style.display='none'
-                x.style.border_color='none'
+                button = lists[i] + '_button'
             }
         }
-
-
     }
 </script>
+{%if shown_list == 'wishlist'%}
+<script>
+    ShowHide('wishlist');
+</script>
+{%elif shown_list == 'added_games'%}
+<script>
+    ShowHide('added_games')
+</script>
+{%endif%}
 {% endblock %}

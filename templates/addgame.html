@@ -1,6 +1,6 @@
 {% extends "layout.html"%}{% block content%}
-{% include "errors.html"%}
-<div class="w3-container w3-half w3-margin-top">
+<div class="w3-container w3-half w3-margin-top" style="float:left;">
+    {% include "messages.html"%}
     <div class="w3-panel w3-card">
         <p>Add Game:</p>
         <form method="POST" action='' enctype="multipart/form-data">

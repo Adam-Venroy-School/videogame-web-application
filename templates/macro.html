@@ -7,13 +7,29 @@
           {%else%}
             <a href="{{url_for('add_wishlist', id=game['id'], backpage=page)}}"><img src="../static/images/list/add.jpg" class="add_remove_button"></img></a>
           {%endif%}
+          {% if current_user.id == game['user_id'] or current_user.username == 'admin'%}
+          <a onclick="DialogueBox(url='{{url_for('deletegame', game=game['name'], backpage=page)}}')">
+            <img src="../static/images/list/cross.jpg" class="delete_button"></img>
+          </a>
           {%endif%}
-            <img src="{{url_for('static', filename=game['image'])}}" alt="{{game['name']}}" style="width:100%;height:70%;">
-        <a href="/games/{{game['name']}}">
-        <div class="w3-container w3-center">
-          <p>{{game['name']}}</p>
-        </div>
+          {%endif%}
+          <img src="{{url_for('static', filename=game['image'])}}" alt="{{game['name']}}" style="width:100%;height:70%;">
+          <a href="/games/{{game['name']}}">
+          <div class="w3-container w3-center">
+            <p>{{game['name']}}</p>
+          </div>
         </a>
     </div>
 </div>
+
+{% if current_user.id == game['user_id'] or current_user.username == 'admin'%}
+<script type="text/javascript">
+  function DialogueBox(url){
+    if(confirm("Delete Game from Database?")){
+      window.location.href = url
+
+    }
+  }
+</script>
+{%endif%}
 {%- endmacro %}
