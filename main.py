@@ -31,7 +31,7 @@ def ReturnPage(backpage):
         if 'shown_list' in backpage:
             return redirect(url_for('user', username=page, shown_list=backpage['shown_list']))
         return redirect(url_for("user", username=page))
-    elif 'dev' in backpage:
+    elif 'developer' in backpage:
         print(backpage['dev'])
         page = backpage['dev']
         return redirect(url_for("dev", name=page))
@@ -145,19 +145,20 @@ def user(username):
             if game.id in wishlist_games_id:
                 wishlist_games.append(db.session.query(Game).filter_by(id=game.id).all()[0])
 
+    #Get dev ids of the devs the user has added.
+    added_devs = db.session.query(Developer).filter_by(user_id=user.id).all()
+
     added_games = db.session.query(Game).filter_by(user_id=user.id).all()
     print("ADDED GAMES", added_games)
     print(user.username,"WISHLIST:", user_page_wishlist)
     print("VIEWER WISHLIST:", wishlist_games)
-    return render_template("userpage.html", wishlist_games=wishlist_games, added_games=added_games, user=user, wishlist_games_id=wishlist_games_id, shown_list=shown_list, user_page_wishlist=user_page_wishlist)
+    return render_template("userpage.html", wishlist_games=wishlist_games, 
+                        added_games=added_games, user=user, wishlist_games_id=wishlist_games_id, 
+                        shown_list=shown_list, user_page_wishlist=user_page_wishlist, added_devs=added_devs)
 
-@login_required
 @app.route("/changepassword", methods=['GET','POST'])
+@login_required
 def change_password():
-    #If user is not logged in and they access, return home
-    if current_user.is_authenticated == False:
-        return redirect(url_for("home"))
-
     password_form = ChangePasswordForm()
     #Check forms are validated
     if FormValidate(password_form):
@@ -206,7 +207,9 @@ def adddev():
         else:
             image = None
         entry = Developer(name=dev, logo=image)
+        user = current_user
         try:
+            user.devs_added.append(entry)
             db.session.add(entry)
             db.session.flush()
         except:
@@ -219,10 +222,7 @@ def adddev():
 
 @app.route("/devs", methods=['GET'])
 def devlist():
-    devs = {}
-    #For Loop that gets all developers and creates dictionary where each dev has an image as its definition
-    for dev in Developer.query.all():
-        devs[dev.name] = dev.logo
+    devs = db.session.query(Developer).all()
     print(devs)
     return render_template("devlist.html", devs=devs)
 
@@ -263,6 +263,8 @@ def addgame():
     devs = []
     for dev in Developer.query.order_by(Developer.name):
         devs.append((dev.name, dev.logo))
+    if len(devs) == 0:
+        return redirect(url_for('error_page', error='no_devs'))
     add_game_form.dev.choices = devs
     print(add_game_form.dev.choices)
 
@@ -335,8 +337,8 @@ def games():
         print("WG:", wishlist_games)
     return render_template('games.html', gamelist=gamelist, wishlist_games_id=wishlist_games_id)
 
-@login_required
 @app.route("/wishlist/add/<id>")
+@login_required
 def add_wishlist(id):
     #Get Game ID
     game = db.session.query(Game).filter_by(id=id).first()
@@ -356,9 +358,8 @@ def add_wishlist(id):
     page = ReturnPage(backpage)
     return page
 
-
-@login_required
 @app.route("/wishlist/remove/<id>")
+@login_required
 def remove_wishlist(id):
     user = current_user
     game = db.session.query(Game).filter_by(id=id).first()
@@ -393,6 +394,33 @@ def deletegame(game):
             return redirect(url_for('error_page', error='delete'))
         else:
             os.remove('static/' + game.image)
+            db.session.commit()
+        if backpage:
+            page = ReturnPage(backpage)
+            return page
+        else:
+            return redirect(url_for('home'))
+    else:
+        print('FAILED USER CHECK')
+        return redirect(url_for('error_page', error='delete'))
+
+@app.route("/deletedev/<dev>")
+@login_required
+def deletedev(dev):
+    backpage = request.args.get('backpage')
+    user = current_user
+    dev = db.session.query(Developer).filter_by(name=dev).one()
+    if dev == None:
+        return redirect(url_for("error_page", error='dev_not_found'))
+    if current_user.id == dev.user_id or current_user.username == 'admin':
+        try:
+            db.session.delete(dev)
+            db.session.flush()
+        except:
+            db.session.rollback()
+            return redirect(url_for('error_page', error='delete'))
+        else:
+            os.remove('static/' + dev.logo)
             db.session.commit()
         if backpage:
             page = ReturnPage(backpage)

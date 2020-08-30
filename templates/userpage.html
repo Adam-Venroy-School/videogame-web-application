@@ -21,17 +21,18 @@
 <button class="w3-button w3-gray" onclick="ShowHide('added_games')">Added Games</button> 
 </div>
 
-<div class="userpage_list" id="wishlist" style="display:none">
+<div class="userpage_lists" id="wishlist" style="display:none">
     {%for game in user_page_wishlist%}
     {{game_item(page={"user" : user['username'], "shown_list" : "wishlist"}, game=game)}}
     {%endfor%}
 </div>
 
-<div class="userpage_list" id='added_games' style='display:none'>
+<div class="userpage_lists" id='added_games' style='display:none'>
     {%for game in added_games%}
     {{game_item(page={"user" : user['username'],  "shown_list" : "added_games"}, game=game)}}
     {%endfor%}
 </div>
+
 <script>
     const lists = ['wishlist', 'added_games'];
     function ShowHide(list){

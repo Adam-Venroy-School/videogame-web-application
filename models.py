@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import os.path
 import os
 from flask_login import UserMixin
+from sqlalchemy.orm import backref
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -30,6 +31,7 @@ class User(db.Model, UserMixin):
     reviews = db.relationship('Review', backref='reviews', lazy=True)
     wishlist = db.relationship('Game', secondary=wishlist, backref="user_wishlist", lazy='subquery')
     games_added = db.relationship('Game')
+    devs_added = db.relationship('Developer')
 
     def __init__(self, username, password):
         self.username = username
@@ -39,7 +41,8 @@ class Developer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), nullable=False)
     logo = db.Column(db.String(40), nullable=True)
-    games = db.relationship('Game', backref='developer', lazy=True)
+    games = db.relationship('Game', cascade='delete', backref=backref('developer', lazy=True))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     def __init__(self, name, logo):
         self.name = name
         self.logo = logo

@@ -152,7 +152,9 @@ div.userpage_buttons{
 }
 
 div.userpage_lists{
+    float:left;
     clear: both;
+
 }
 
 /* Footer */
