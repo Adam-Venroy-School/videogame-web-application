@@ -2,20 +2,35 @@
 {% from "macro.html" import game_item with context %}
 <div class="sidepanel">
 <div class="w3-card-4" style="height:270px;margin-bottom:10px;">
-    <img src="{{url_for('static', filename=developer['logo'])}}" alt="" style="width:250px;height:200px;">
+    <img src="{{url_for('static', filename=developer['logo'])}}" alt="" style="width:100%;height:70%;">
     <div class="w3-container w3-center">
-        <p>{{developer['name']}}</p>
+        <p class='sidepanel' style='line-height:50px;'>{{developer['name']}}</p>
     </div>
 </div>
-<a href="{{ url_for('addgame', dev_from_page=developer['name']) }}">
+<a href="{{ url_for('add_game', dev_from_page=developer['name']) }}">
 <div class="w3-card" style="max-height:10%;padding: 10px;">
-    <p>Add Game</p>
+    <p class='sidepanel'>Add Game</p>
 </div>
 </a>
+<br>
+{% if current_user.id == developer['user_id'] or current_user.username == 'admin' %}
+<a onclick="DialogueBox(url='{{url_for('delete_dev', dev=developer['name'], backpage={'developerlist' : 0})}}')">
+    <div class="w3-card" style="max-height:10%;padding: 10px;">
+        <p class='sidepanel'>Delete Developer</p>
+    </div>
+</a>
+{%endif%}
 </div>
 <div class="dev-list">
     {%for game in dev_games%}
-    {{game_item(page={"dev" : developer['name']}, game=game )}}
+    {{game_item(page={"developer" : developer['name']}, game=game )}}
     {%endfor%}
 </div>
+<script type="text/javascript">
+    function DialogueBox(url){
+      if(confirm("Delete Developer from Database? This will remove all games associated with the Developer.")){
+        window.location.href = url
+      }
+    }
+</script>
 {% endblock %}

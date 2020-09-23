@@ -1,15 +1,33 @@
 {% extends "layout.html"%}{% block content%}
-<div class="title">
-  <div class="w3-display-container" style="width: 100%; height:600px; overflow:hidden;">
-      <img src="../static/images/homepage/image1.jpg" class="background_image" style="height:900px; width:100%">
-      <div class="w3-display-middle w3-large">
-        <h1 class="w3-jumbo w3-text-white w3-wide"><b>GAMES 2<br>PLAY</b></h1>
+<div class="home">
+  <div class="title">
+    <div class="w3-display-container" style="width: 100%; height:600px; overflow:hidden;">
+        <img src="../static/images/homepage/image1.jpg" class="background_image" style="height:900px; width:100%">
+        <div class="w3-display-middle w3-large">
+          <h1 class="w3-jumbo w3-text-white w3-wide"><b>GAMES 2<br>PLAY</b></h1>
+        </div>
+    </div>
+  </div>
+
+  <ul class="homepage_buttons">
+    <li class="homepage_buttons">
+    <a href='/games'>
+    <div class="w3-content w3-padding" style="max-width: 200px;">
+      <div class="w3-card" style='width: 100px;height: 50px;'>
+        <p class='homepage_buttons'>Games</p>
       </div>
-  </div>
-</div>
-<div class="w3-content w3-padding" style="max-width:1564px">
-  <div class="w3-card">
-    <p>Games</p>
-  </div>
+    </div>
+    </a>
+  </li>
+  <li class="homepage_buttons">
+    <a href='/devs'>
+      <div class="w3-content w3-padding" style="max-width: 200px;">
+        <div class="w3-card" style='width: 100px;height:50px;'>
+          <p class='homepage_buttons'>Developers</p>
+        </div>
+      </div>
+      </a>
+    </li>
+  </ul>
 </div>
 {% endblock %}

@@ -1,16 +1,20 @@
-<ul class="nav">
+<div class="w3-bar w3-dark-grey">
     <a href="/home"><li class="w3-bar-item w3-button w3-mobile">Home</li></a>
     <a href="/games"><li class="w3-bar-item w3-button w3-mobile">Games</li></a>
     <a href="/devs"><li class="w3-bar-item w3-button w3-mobile">Developers</li></a>
-    <li class="sideheader">Games 2 Play</li>
     {% if current_user.is_authenticated == false %}
     <a href="/register"><li class="w3-bar-item w3-button w3-mobile">Register</li></a>
     <a href="/login"><li class="w3-bar-item w3-button w3-mobile">Login</li></a>
     {% else %}
     <a href="/addgame"><li class="w3-bar-item w3-button w3-mobile">Add Game</li></a>
     <a href="/adddev"><li class="w3-bar-item w3-button w3-mobile">Add Developer</li></a>
-    <a href="/logout"><li class="log_out"><a href="/logout">Log out</li></a>
-    <li class="logged_in">{{current_user.username}}</li>
-    <a href="/user/{{current_user.username}}"><li class="w3-bar-item w3-button w3-mobile" style="float:right;">User Page</li></a>
+    <div class="w3-dropdown-hover w3-right">
+        <button class="w3-button w3-black">Options</button>
+        <div class="w3-dropdown-content w3-bar-block w3-border" style="right:0">
+          <a href="/user/{{current_user.username}}" class="w3-bar-item w3-button">User Page</a>
+          <a href="/changepassword" class="w3-bar-item w3-button">Change Password</a>
+          <a href="/logout" class="w3-bar-item w3-button">Log Out</a>
+        </div>
+      </div>
     {% endif %}
-</ul>
+</div>

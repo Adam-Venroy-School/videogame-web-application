@@ -1,0 +1,54 @@
+{% extends "layout.html"%}{% block content%}
+<div class='sidepanel'>
+    <div class="w3-card-4" style="height:270px;width: 150px;margin-bottom:10px;">
+        <img src="{{url_for('static', filename=game['image'])}}" alt="" style="width:100%;height:70%;">
+        <div class="w3-container w3-center">
+            <p class='sidepanel' style='line-height:50px;'>{{game['name']}}</p>
+        </div>
+    </div>
+    <a href="http://{{game['link']}}">
+        <div class="w3-card" style="max-height:10%;padding: 10px;">
+            <p class='sidepanel'>Link</p>
+        </div>
+    </a>
+    {%if current_user.is_authenticated%}
+    {% if game['id'] in wishlist_games_id %}
+    <a href="{{url_for('remove_wishlist', id=game['id'], backpage={'game' : game['name']})}}">
+        <div class="w3-card" style="height:60px;padding: 10px;margin-top: 10px;max-width: 150px;">
+            <p style='margin-top:10px'>Remove from Wishlist</p>
+        </div>
+    </a>
+    {%else%}
+    <a href="{{url_for('add_wishlist', id=game['id'], backpage={'game' : game['name']})}}">
+        <div class="w3-card" style="height:60px;padding: 10px;margin-top: 10px;max-width: 150px;">
+            <p>Add to Wishlist</p>
+        </div>
+    </a>
+    {%endif%}
+    {%if current_user.id == game.user_id or current_user.username == 'admin'%}
+    <a onclick="DialogueBox(url='{{url_for('delete_game', game=game['name'], backpage={'games' : 0})}}')">
+        <div class="w3-card" style="height:60px;padding: 10px;margin-top: 10px;max-width: 150px;">
+            <p>Delete Game</p>
+        </div>
+    </a>
+    {%endif%}
+    {%endif%}
+</div>
+{% if game['video']%}
+{% if game['video']|length > 1 %}
+<iframe id="player" type="text/html" width="640" height="401" src="https://www.youtube.com/embed/{{game['video']}}" frameborder="0"></iframe>
+{%endif%}
+{%endif%}
+<p class='game_desc'>{{game['desc']}}</p>
+
+{% if current_user.id == game['user_id'] or current_user.username == 'admin'%}
+<script type="text/javascript">
+  function DialogueBox(url){
+    if(confirm("Delete Game from Database?")){
+      window.location.href = url
+
+    }
+  }
+</script>
+{%endif%}
+{% endblock %}

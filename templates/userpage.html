@@ -4,37 +4,70 @@
     <div class="w3-card-4" style="height:270px;margin-bottom:10px;">
         <img src="{{url_for('static', filename='images/user/user.jpg')}}" alt="{{user['username']}}" style="width:250px;height:200px;">
         <div class="w3-container w3-center">
-            <p>{{user['username']}}</p>
+            <p class='side-panel' style='line-height:50px;'>{{user['username']}}</p>
         </div>
     </div>
     {%if user == current_user%}
     <a href="{{url_for('change_password')}}">
         <div class="w3-card" style="max-height:10%;padding: 10px;">
-            <p>Change Password</p>
+            <p class='sidepanel'>Change Password</p>
         </div>
     </a>
     {%endif%}
 </div>
 
-<div class="userpage_buttons">
-<button class="w3-button w3-gray" onclick="ShowHide('wishlist')">Wishlist</button> 
-<button class="w3-button w3-gray" onclick="ShowHide('added_games')">Added Games</button> 
-</div>
+<div>
+    <div class="userpage_buttons">
+    <button class="w3-button w3-gray" onclick="ShowHide('wishlist')">Wishlist</button> 
+    <button class="w3-button w3-gray" onclick="ShowHide('added_games')">Added Games</button> 
+    <button class="w3-button w3-gray" onclick="ShowHide('added_devs')">Added Developers</button> 
+    </div>
 
-<div class="userpage_lists" id="wishlist" style="display:none">
-    {%for game in user_page_wishlist%}
-    {{game_item(page={"user" : user['username'], "shown_list" : "wishlist"}, game=game)}}
-    {%endfor%}
-</div>
+    <div class="userpage_lists" id="wishlist" style="display:none; clear:both;">
+        {%for game in user_page_wishlist%}
+        {{game_item(page={"user" : user['username'], "shown_list" : "wishlist"}, game=game)}}
+        {%endfor%}
+    </div>
 
-<div class="userpage_lists" id='added_games' style='display:none'>
-    {%for game in added_games%}
-    {{game_item(page={"user" : user['username'],  "shown_list" : "added_games"}, game=game)}}
-    {%endfor%}
-</div>
+    <div class="userpage_lists" id='added_games' style='display:none; clear:both;'>
+        {%for game in added_games%}
+        {{game_item(page={"user" : user['username'],  "shown_list" : "added_games"}, game=game)}}
+        {%endfor%}
+    </div>
 
+    <div class="userpage_lists" id='added_devs' style='display:none; clear:both;'>
+        {% for dev in added_devs%}
+        <div class="list-item" style="float:left;">
+            <div class="w3-card-4" style="width:150px;height:260px;position: relative;">
+              <img src="{{url_for('static', filename=dev['logo'])}}" alt="{{dev['name']}}" style="width:100%;height:70%;">
+              {% if current_user.id == dev['user_id'] or current_user.username == 'admin'%}
+              <a onclick="DialogueBox(url='{{url_for('delete_dev', dev=dev['name'], backpage={'user' : user['username'], 'shown_list' : 'added_devs'})}}')">
+                <img src="../static/images/list/cross.jpg" class="delete_button">
+              </a>
+              <script>
+              </script>
+              {%endif%}
+              <a href="/devs/{{dev['name']}}">
+            <div class="w3-container w3-center">
+              <p class='list-item'>{{dev['name']}}</p>
+            </div>
+          </a>
+            </div>
+        </div>
+        {% if current_user.id == dev['user_id'] or current_user.username == 'admin'%}
+        <script type="text/javascript">
+          function DialogueBox(url){
+            if(confirm("Delete Developer from Database? This will remove all games associated with the Developer.")){
+              window.location.href = url
+            }
+          }
+        </script>
+        {%endif%}
+        {%endfor%}
+    </div>
+</div>
 <script>
-    const lists = ['wishlist', 'added_games'];
+    const lists = ['wishlist', 'added_games', 'added_devs'];
     function ShowHide(list){
         for(var i = 0; i < lists.length; i++){
             if(lists[i]==list){
@@ -57,6 +90,10 @@
 {%elif shown_list == 'added_games'%}
 <script>
     ShowHide('added_games')
+</script>
+{%elif shown_list == 'added_devs'%}
+<script>
+    ShowHide('added_devs')
 </script>
 {%endif%}
 {% endblock %}

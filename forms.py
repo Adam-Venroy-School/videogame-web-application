@@ -29,7 +29,7 @@ class ChangePasswordForm(FlaskForm):
     password_submit = SubmitField("Change Password")
     
 class AddDevForm(FlaskForm):
-    name = StringField('Name', [validators.Length(min=1, max=40)])
+    name = StringField('Name', [validators.Length(min=1, max=35)])
     image = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png'], "Images only")])
     add_dev_submit = SubmitField("Add Developer")
     
