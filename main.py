@@ -259,6 +259,8 @@ def dev(name):
         dev_games = db.session.query(Game).filter_by(dev=developer.name).all()
         print("DEV GAMES:", dev_games)
 
+    user_adder = db.session.query(User).filter_by(id=developer.user_id).first()
+
     #If user is logged in, give option to add/remove to wishlist
     if current_user.is_authenticated:
         wishlist_games = db.session.query(wishlist).filter_by(user_id=current_user.id).all()
@@ -267,8 +269,8 @@ def dev(name):
         print("WGI", wishlist_games)
         gamelist = Game.query.all()
         #For Loop that searches all games and checks if in user wishlist
-    return render_template("dev.html", name=name, developer=developer,
-                            dev_games=dev_games, wishlist_games_id=wishlist_games_id)
+    return render_template("dev.html", name=name, developer=developer, dev_games=dev_games,
+                            wishlist_games_id=wishlist_games_id, user_adder=user_adder)
 
 # Add Game Page - Page where user can add games
 @app.route("/addgame", methods=['GET', 'POST'])
@@ -383,11 +385,13 @@ def game(name):
     if game == None:
         return redirect(url_for('error_page', error='no_game_found'))
     print(game)
+    adder_user = db.session.query(User).filter_by(id=game.user_id).first()
     if current_user.is_authenticated:
         wishlist_games = db.session.query(wishlist).filter_by(user_id=current_user.id).all()
         wishlist_games_id = [x[0] for x in wishlist_games]
 
-    return render_template('game.html', game=game, wishlist_games_id=wishlist_games_id)
+    return render_template('game.html', game=game, wishlist_games_id=wishlist_games_id,
+                            adder_user=adder_user)
 
 # Function for adding game to wishlist.
 @app.route("/wishlist/add/<id>")

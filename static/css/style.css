@@ -125,7 +125,7 @@ div.list{
 }
 p.list-item{
     vertical-align: center;
-    line-height: 60px;
+    line-height: 30px;
 }
 
 /* Button for adding and removing games to wishlist */

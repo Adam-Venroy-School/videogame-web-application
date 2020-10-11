@@ -3,12 +3,17 @@
     <div class="w3-card-4" style="height:270px;width: 150px;margin-bottom:10px;">
         <img src="{{url_for('static', filename=game['image'])}}" alt="" style="width:100%;height:70%;">
         <div class="w3-container w3-center">
-            <p class='sidepanel' style='line-height:50px;'>{{game['name']}}</p>
+            <p class='sidepanel' style='line-height:20px;word-wrap: break-word;'>{{game['name']}}</p>
         </div>
     </div>
     <a href="http://{{game['link']}}">
         <div class="w3-card" style="max-height:10%;padding: 10px;">
             <p class='sidepanel'>Link</p>
+        </div>
+    </a>
+    <a href="{{url_for('dev', name=game['dev'])}}">
+        <div class="w3-card" style="height:60px;padding: 5px;margin-top: 10px;max-width: 150px; word-wrap: break-word;">
+            <p>Developed by {{game['dev']}}</p>
         </div>
     </a>
     {%if current_user.is_authenticated%}
@@ -32,6 +37,13 @@
         </div>
     </a>
     {%endif%}
+    {%endif%}
+    {%if current_user.id != game.user_id%}
+    <a href="{{url_for('user', username=adder_user['username'])}}">
+        <div class="w3-card" style="height:60px;padding: 5px;margin-top: 10px;max-width: 150px; word-wrap: break-word;">
+            <p>Added by {{adder_user['username']}} </p>
+        </div>
+    </a>
     {%endif%}
 </div>
 {% if game['video']%}

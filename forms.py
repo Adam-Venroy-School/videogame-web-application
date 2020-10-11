@@ -13,7 +13,7 @@ class LoginForm(FlaskForm):
     login_submit = SubmitField("Login")
 
 class AddGameForm(FlaskForm):
-    name = StringField('Name', [validators.Length(min=1, max=100)])
+    name = StringField('Name', [validators.Length(min=1, max=40)])
     dev = SelectField('Developer')
     link = StringField('Download Link',[validators.Length(max=400)])
     price = DecimalField('Price',[validators.NumberRange(max=9999)])
@@ -25,11 +25,12 @@ class AddGameForm(FlaskForm):
 class ChangePasswordForm(FlaskForm):
     current_password = PasswordField('Current Password', [validators.Length(max=100)])
     new_password = PasswordField('New Password', [validators.Length(min=8, max=100)])
-    password_confirm = PasswordField('Confirm Password',validators=[validators.Length(min=8, max=100), validators.EqualTo('new_password')])
+    password_confirm = PasswordField('Confirm Password',validators=[validators.Length(min=8, max=100), 
+                                    validators.EqualTo('new_password')])
     password_submit = SubmitField("Change Password")
     
 class AddDevForm(FlaskForm):
-    name = StringField('Name', [validators.Length(min=1, max=35)])
+    name = StringField('Name', [validators.Length(min=1, max=20)])
     image = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png'], "Images only")])
     add_dev_submit = SubmitField("Add Developer")
     
