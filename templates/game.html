@@ -46,12 +46,54 @@
     </a>
     {%endif%}
 </div>
-{% if game['video']%}
-{% if game['video']|length > 1 %}
-<iframe id="player" type="text/html" width="640" height="401" src="https://www.youtube.com/embed/{{game['video']}}" frameborder="0"></iframe>
-{%endif%}
-{%endif%}
-<p class='game_desc'>{{game['desc']}}</p>
+<div>
+    <div class='game_details'>
+    {% if game['video']%}
+    {% if game['video']|length > 1 %}
+    <iframe id="player" type="text/html" width="500" height="400" src="https://www.youtube.com/embed/{{game['video']}}" frameborder="0"></iframe>
+    {%endif%}
+    {%endif%}
+    <p class='game_desc'>{{game['desc']}}</p>
+    </div>
+    {% if current_user.is_authenticated and reviewed == false%}
+    <div class="w3-container w3-half w3-margin-top">
+        <div class="w3-panel w3-card" style='padding-bottom: 10px; width: 200%;'>
+            <form method="POST" action='' enctype="multipart/form-data">
+            <p>Would you Recommend this Game?</p>
+            {{review_form.recommend}}
+            <p>Write a Review: </p>
+            {{review_form.review(cols="175", rows="10")}}
+            <br>
+            <p><button class="w3-button w3-section w3-grey w3-ripple" name="submit_review">Submit</button></p>
+            <br>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    {%if reviews|length > 0%}
+
+    <table class='w3-table w3-bordered'>
+    <tr>
+        <th>User</th>
+        <th>Review</th>
+        <th>Recommendation</th>
+    </tr>
+    {% for review in reviews%}
+    <tr>
+        <td>{{review.reviewer}}</td>
+        <td>{{review.review}}</td>
+        {% if review.recommend == 1 %}
+        <td>Does Recommend</td>
+        {%else%}
+        <td>Doesn't Recommend</td>
+        {%endif%}
+    </tr>
+    {%endfor%}
+    </table>
+    {%endif%}
+</div>
+
+
 
 {% if current_user.id == game['user_id'] or current_user.username == 'admin'%}
 <script type="text/javascript">

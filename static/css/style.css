@@ -4,6 +4,8 @@ html{
 body{
     font-family: monospace;
     color: black;
+    height: 100%;
+    min-height: 100%;
 }
 
 .header{
@@ -166,10 +168,14 @@ p.sidepanel{
     margin-left: 20px;
     margin-top: 20px;
 }
+
 p.game_desc{
-    font-size: 20px;
-    max-width: 800px;
+    position: relative;
+    height: 200px;
     margin-left: 20px;
+}
+div.review{
+    clear: both;
 }
 /* Dev and User Page */
 div.list-item{
@@ -207,9 +213,12 @@ div.userpage_lists{
 }
 
 /* Footer */
-footer{
-    padding: 10px;
-    font-size: 20px;
+footer {
+    clear: both;
+    position: relative;
+    height: 50px;
+    margin-top: 53px;
+    background-color: gray;
     text-align: center;
-    background-color: #333;
+    color: black;
 }

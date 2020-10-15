@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, DecimalField, SelectField, validators
+from wtforms import StringField, SubmitField, PasswordField, DecimalField, SelectField, BooleanField, TextAreaField, validators
+from wtforms.widgets import TextArea
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 
 class RegisterForm(FlaskForm):
@@ -17,7 +18,8 @@ class AddGameForm(FlaskForm):
     dev = SelectField('Developer')
     link = StringField('Download Link',[validators.Length(max=400)])
     price = DecimalField('Price',[validators.NumberRange(max=9999)])
-    image = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png'], "Images only")])
+    image = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png'],
+                    "Images only")])
     desc = StringField('Description', [validators.Length(max=1000)])
     video = StringField('Video', [validators.Length(max=100)])
     add_game_submit = SubmitField("Add Game")
@@ -34,3 +36,7 @@ class AddDevForm(FlaskForm):
     image = FileField('Image', validators=[FileRequired(), FileAllowed(['jpg', 'png'], "Images only")])
     add_dev_submit = SubmitField("Add Developer")
     
+class ReviewForm(FlaskForm):
+    recommend = BooleanField('Recommend')
+    review = TextAreaField('Review', validators=[validators.Length(max=1000)], widget=TextArea())
+    submit_review = SubmitField("Submit")

@@ -13,7 +13,7 @@ app.secret_key = os.urandom(16)
 
 # Function for checking if forms are validated - we use this a lot.
 def form_validate(form):
-    if request.method == 'POST' and form.validate_on_submit():
+    if request.method == 'POST' and form.validate:
         return True
     else:
         return False
@@ -51,6 +51,7 @@ def return_page(backpage):
 def get_user(user_id):
   return User.query.get(int(user_id))
 
+# Home Page - Returns home.html layout
 @app.route("/", methods=['GET'])
 @app.route("/home", methods=['GET'])
 def home():
@@ -312,6 +313,8 @@ def add_game():
         else:
             image = None
         desc = add_game_form.desc.data
+        if len(desc) == 0:
+            desc = 'No Description Added'
         if add_game_form.video.data:
             video = add_game_form.video.data
             if '=' not in video:
@@ -377,21 +380,56 @@ def games():
     return render_template('games.html', gamelist=gamelist,
                             wishlist_games_id=wishlist_games_id)
 
-@app.route("/games/<name>", methods=['GET'])
+@app.route("/games/<name>", methods=['GET', 'POST'])
 def game(name):
+    review_form = ReviewForm()
     wishlist_games_id = []
     print(name)
     game = db.session.query(Game).filter_by(name=name).first()
+    reviews = db.session.query(Review).filter_by(game_name=game.name).all()
+    print(reviews)
+    reviewed = False
+
+    if current_user.is_authenticated:
+        for i in reviews:
+            if i.reviewer == current_user.username:
+                reviewed = True
+
     if game == None:
         return redirect(url_for('error_page', error='no_game_found'))
+
     print(game)
     adder_user = db.session.query(User).filter_by(id=game.user_id).first()
+
     if current_user.is_authenticated:
         wishlist_games = db.session.query(wishlist).filter_by(user_id=current_user.id).all()
         wishlist_games_id = [x[0] for x in wishlist_games]
 
+    if form_validate(review_form):
+        if current_user.is_authenticated == False:
+            return redirect(url_for('home'))
+        print('POSTING REVIEW')
+        review_body = review_form.review.data
+        review_rec = review_form.recommend.data
+        user = current_user.username
+        game_name = name
+        entry = Review(reviewer=user, game_name=game_name, review=review_body, recommend=review_rec)
+
+        try:
+            db.session.add(entry)
+            db.session.flush()
+        except:
+            return redirect(url_for('error_page', error='review'))
+        else:
+            db.session.commit()
+            return redirect(url_for('game', name=game.name))
+
+    print('REQUEST METHOD: ', request.method)
+    print('FORM VALIDATION: ', review_form.validate())
+    print(form_validate(review_form))
     return render_template('game.html', game=game, wishlist_games_id=wishlist_games_id,
-                            adder_user=adder_user)
+                            adder_user=adder_user, review_form=review_form, reviewed=reviewed,
+                            reviews=reviews)
 
 # Function for adding game to wishlist.
 @app.route("/wishlist/add/<id>")
@@ -453,7 +491,9 @@ def delete_game(game):
             db.session.rollback()
             return redirect(url_for('error_page', error='delete'))
         else:
+            print('static/' + game.image)
             os.remove('static/' + game.image)
+            print('IMAGE DELETE TEST')
             db.session.commit()
         if backpage:
             page = return_page(backpage)
