@@ -51,7 +51,7 @@ class Game(db.Model):
     image = db.Column(db.String(200), nullable=True)
     desc = db.Column(db.String(1000), nullable=True)
     video = db.Column(db.String(40), nullable=True)
-    reviews = db.relationship('Review', backref='game', lazy=True)
+    reviews = db.relationship('Review', cascade='delete', backref=backref('game', lazy=True))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __init__(self, name, dev, link, price, image, desc, video):

@@ -386,17 +386,20 @@ def game(name):
     wishlist_games_id = []
     print(name)
     game = db.session.query(Game).filter_by(name=name).first()
+
+    # If game doesn't exist return error
+    if game == None:
+        return redirect(url_for('error_page', error='no_game_found'))
+
     reviews = db.session.query(Review).filter_by(game_name=game.name).all()
     print(reviews)
     reviewed = False
 
+    # For loop to check if user has reviewed game
     if current_user.is_authenticated:
         for i in reviews:
             if i.reviewer == current_user.username:
                 reviewed = True
-
-    if game == None:
-        return redirect(url_for('error_page', error='no_game_found'))
 
     print(game)
     adder_user = db.session.query(User).filter_by(id=game.user_id).first()
@@ -405,6 +408,7 @@ def game(name):
         wishlist_games = db.session.query(wishlist).filter_by(user_id=current_user.id).all()
         wishlist_games_id = [x[0] for x in wishlist_games]
 
+    # If a review is posted - run this:
     if form_validate(review_form):
         if current_user.is_authenticated == False:
             return redirect(url_for('home'))
@@ -415,6 +419,7 @@ def game(name):
         game_name = name
         entry = Review(reviewer=user, game_name=game_name, review=review_body, recommend=review_rec)
 
+        #There shouldn't be any errors - but just in case.
         try:
             db.session.add(entry)
             db.session.flush()

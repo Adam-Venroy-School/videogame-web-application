@@ -61,7 +61,7 @@
             <form method="POST" action='' enctype="multipart/form-data">
             <p>Would you Recommend this Game?</p>
             {{review_form.recommend}}
-            <p>Write a Review: </p>
+            <p>Write a Review (500 Charactor Limit): </p>
             {{review_form.review(cols="175", rows="10")}}
             <br>
             <p><button class="w3-button w3-section w3-grey w3-ripple" name="submit_review">Submit</button></p>
@@ -72,7 +72,7 @@
     {% endif %}
     {%if reviews|length > 0%}
 
-    <table class='w3-table w3-bordered'>
+    <table class='w3-table w3-bordered' style='table-layout: fixed; width: 100%;'>
     <tr>
         <th>User</th>
         <th>Review</th>
@@ -81,7 +81,7 @@
     {% for review in reviews%}
     <tr>
         <td>{{review.reviewer}}</td>
-        <td>{{review.review}}</td>
+        <td style='word-wrap: break-word'>{{review.review}}</td>
         {% if review.recommend == 1 %}
         <td>Does Recommend</td>
         {%else%}
