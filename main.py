@@ -10,7 +10,7 @@ from ast import literal_eval
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.secret_key = os.urandom(16)
-
+forbidden_characters = ['?', '/', '\\', ':', '<', '>', '|', '"', '*']
 # Function for checking if forms are validated - we use this a lot.
 def form_validate(form):
     if request.method == 'POST' and form.validate:
@@ -202,6 +202,10 @@ def add_dev():
     if form_validate(add_dev_form):
         print("VALIDATION PASSED")
         dev = add_dev_form.name.data.strip()
+        for i in forbidden_characters:
+            if i in dev:
+                flash('Please remove any of the following characters - :, ?')
+                return redirect(url_for('add_dev'))
         if db.session.query(Developer).filter(func.lower(Developer.name)==dev.lower()).scalar():
             flash("Error: Dev already added")
             return render_template("adddev.html", add_dev_form=add_dev_form)
@@ -230,6 +234,7 @@ def add_dev():
             # If flush returns no error, commit changes and flash success message.
             db.session.commit()
             flash("%s successfully added" % entry.name, 'success')
+            return redirect(url_for('add_dev'))
     # If the user posts and fail validation, return error msgs. 
     elif request.method == 'POST' and add_dev_form.validate_on_submit() == False:  
         if 'name' in add_dev_form.errors:
@@ -340,6 +345,7 @@ def add_game():
             flash('%s has been successfully added!' % entry.name, 'success')
             print("GAME ADDED")
             db.session.commit()
+            return redirect(url_for('add_game'))
     elif request.method == 'POST' and add_game_form.validate_on_submit() == False:
         #If statements checking if an error has occured, and flashing to let user know
         if 'name' in add_game_form.errors:
@@ -384,7 +390,6 @@ def games():
 def game(name):
     review_form = ReviewForm()
     wishlist_games_id = []
-    print(name)
     game = db.session.query(Game).filter_by(name=name).first()
 
     # If game doesn't exist return error
@@ -392,7 +397,6 @@ def game(name):
         return redirect(url_for('error_page', error='no_game_found'))
 
     reviews = db.session.query(Review).filter_by(game_name=game.name).all()
-    print(reviews)
     reviewed = False
 
     # For loop to check if user has reviewed game
@@ -401,7 +405,6 @@ def game(name):
             if i.reviewer == current_user.username:
                 reviewed = True
 
-    print(game)
     adder_user = db.session.query(User).filter_by(id=game.user_id).first()
 
     if current_user.is_authenticated:
@@ -410,28 +413,41 @@ def game(name):
 
     # If a review is posted - run this:
     if form_validate(review_form):
+
         if current_user.is_authenticated == False:
             return redirect(url_for('home'))
-        print('POSTING REVIEW')
-        review_body = review_form.review.data
-        review_rec = review_form.recommend.data
-        user = current_user.username
-        game_name = name
-        entry = Review(reviewer=user, game_name=game_name, review=review_body, recommend=review_rec)
 
-        #There shouldn't be any errors - but just in case.
-        try:
-            db.session.add(entry)
-            db.session.flush()
-        except:
-            return redirect(url_for('error_page', error='review'))
-        else:
-            db.session.commit()
-            return redirect(url_for('game', name=game.name))
+        #If user has submitted through delete button -
+        if review_form.delete_review.data:
+            review = db.session.query(Review).filter_by(reviewer=current_user.username).first()
+            try:
+                db.session.delete(review)
+                db.session.flush()
+            except:
+                db.session.rollback()
+                return redirect(url_for('error_page', error='review'))
+            else:
+                db.session.commit()
+                return redirect(url_for('game', name=game.name))
 
-    print('REQUEST METHOD: ', request.method)
-    print('FORM VALIDATION: ', review_form.validate())
-    print(form_validate(review_form))
+        #If user has submitted through submit_review button -
+        elif review_form.submit_review.data:
+            review_body = review_form.review.data
+            review_rec = review_form.recommend.data
+            user = current_user.username
+            game_name = name
+            entry = Review(reviewer=user, game_name=game_name, review=review_body, recommend=review_rec)
+
+            #There shouldn't be any errors - but just in case.
+            try:
+                db.session.add(entry)
+                db.session.flush()
+            except:
+                return redirect(url_for('error_page', error='review'))
+            else:
+                db.session.commit()
+                return redirect(url_for('game', name=game.name))
+
     return render_template('game.html', game=game, wishlist_games_id=wishlist_games_id,
                             adder_user=adder_user, review_form=review_form, reviewed=reviewed,
                             reviews=reviews)
@@ -442,6 +458,8 @@ def game(name):
 def add_wishlist(id):
     #Get Game ID
     game = db.session.query(Game).filter_by(id=id).first()
+    if game == None:
+        return redirect(url_for("error_page", error='wishlist'))
     user = current_user
     backpage = request.args.get('backpage')
     print("BP:", backpage)
@@ -465,6 +483,7 @@ def remove_wishlist(id):
     user = current_user
     game = db.session.query(Game).filter_by(id=id).first()
     backpage = request.args.get('backpage')
+
     try:
         user.wishlist.remove(game)
         db.session.flush()
@@ -484,8 +503,10 @@ def delete_game(game):
     print(backpage)
     user = current_user
     game = db.session.query(Game).filter_by(name=game).first()
+
     if game == None:
         return redirect(url_for("error_page", error='game_not_found'))
+
     #Check that user is the one that added game or admin
     if current_user.id == game.user_id or current_user.username == 'admin':
         try:
@@ -494,7 +515,7 @@ def delete_game(game):
         except:
             #Incase error occurs, User will be returned to error page. No changes to DB
             db.session.rollback()
-            return redirect(url_for('error_page', error='delete'))
+            return redirect(url_for('error_page', error='delete_game'))
         else:
             print('static/' + game.image)
             os.remove('static/' + game.image)
@@ -507,7 +528,7 @@ def delete_game(game):
             return redirect(url_for('home'))
     else:
         print('FAILED USER CHECK')
-        return redirect(url_for('error_page', error='delete'))
+        return redirect(url_for('error_page', error='delete_game'))
 
 # Function that deletes dev from DB
 @app.route("/deletedev/<dev>")
@@ -517,8 +538,10 @@ def delete_dev(dev):
     user = current_user
     # Get Dev Object user wants to delete
     dev = db.session.query(Developer).filter_by(name=dev).one()
+
     if dev == None:
         return redirect(url_for("error_page", error='dev_not_found'))
+
     if current_user.id == dev.user_id or current_user.username == 'admin':
         try:
             db.session.delete(dev)

@@ -2,12 +2,27 @@
 <div class="error_message">
     {%if error == "404"%}
     <p>Error 404: Page not found.</p>
+
     {%elif error == "wishlist"%}
-    <p>Wishlist Error: Failed to add entry.</p>
-    {%elif error == "prohibited_name"%}
-    <p>Name Error: Name is not allowed.</p>
+    <p>Wishlist Error: Failed to add or remove entry.</p>
+
     {%elif error == "user_not_found"%}
     <p>User Error: User was not found.</p>
+
+    {%elif error == "dev_not_found"%}
+    <p>Error: Developer was not found.</p>
+
+    {%elif error == "no_devs"%}
+    <p>Error: Please add a developer before adding a game!</p>
+
+    {%elif error == "game_not_found"%}
+    <p>Error: Game not found.</p>
+
+    {%elif error == "review"%}
+    <p>Review Error.</p>
+    {%elif error == "delete"%}
+    <p>Error: Unable to delete entry.</p>
+    
     {%else%}
     <p>Unknown Error: Please try again.</p>
     {%endif%}

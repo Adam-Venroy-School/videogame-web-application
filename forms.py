@@ -39,4 +39,5 @@ class AddDevForm(FlaskForm):
 class ReviewForm(FlaskForm):
     recommend = BooleanField('Recommend')
     review = TextAreaField('Review', validators=[validators.Length(max=500)], widget=TextArea())
+    delete_review = SubmitField("Delete")
     submit_review = SubmitField("Submit")

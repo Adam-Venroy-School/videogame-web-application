@@ -57,14 +57,15 @@
     </div>
     {% if current_user.is_authenticated and reviewed == false%}
     <div class="w3-container w3-half w3-margin-top">
-        <div class="w3-panel w3-card" style='padding-bottom: 10px; width: 200%;'>
+        <div class="w3-panel w3-card" style='padding-bottom: 10px; width: 210%;'>
             <form method="POST" action='' enctype="multipart/form-data">
+            {{review_form.csrf_token }}
             <p>Would you Recommend this Game?</p>
             {{review_form.recommend}}
             <p>Write a Review (500 Charactor Limit): </p>
             {{review_form.review(cols="175", rows="10")}}
             <br>
-            <p><button class="w3-button w3-section w3-grey w3-ripple" name="submit_review">Submit</button></p>
+            {{review_form.submit_review}}
             <br>
             </form>
         </div>
@@ -77,6 +78,7 @@
         <th>User</th>
         <th>Review</th>
         <th>Recommendation</th>
+        <th></th>
     </tr>
     {% for review in reviews%}
     <tr>
@@ -86,6 +88,14 @@
         <td>Does Recommend</td>
         {%else%}
         <td>Doesn't Recommend</td>
+        {%endif%}
+        {%if review.reviewer == current_user.username%}
+        <form method="POST" action='' enctype="multipart/form-data">
+        {{review_form.csrf_token }}
+        <td>{{review_form.delete_review}}</td>
+        </form>
+        {%else%}
+        <td></td>
         {%endif%}
     </tr>
     {%endfor%}

@@ -173,6 +173,7 @@ p.game_desc{
     position: relative;
     height: 200px;
     margin-left: 20px;
+    max-width: 800px;
 }
 div.review{
     clear: both;
